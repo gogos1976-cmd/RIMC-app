@@ -749,12 +749,12 @@ body::before {
 
       <!-- UPLOAD -->
       <div class="bt-upload-zone" id="bt-drop" onclick="document.getElementById('bt-file').click()">
-        <input type="file" id="bt-file" accept=".csv,.txt" onchange="btLoadFile(this)">
+        <input type="file" id="bt-file" accept=".csv,.txt" multiple onchange="btLoadFiles(this)">
         <div class="bt-upload-icon">📂</div>
         <div class="bt-upload-label">
           <strong>Nahraj CSV z histdata.com</strong><br>
-          Formát: DAT_GBPUSD_M1_*.csv<br>
-          nebo M5/M15/H1 · až 2+ roky dat
+          Vyber více souborů najednou (2023+2024+2025)<br>
+          Formát: DAT_GBPUSD_M1_*.csv
         </div>
       </div>
       <div id="bt-file-info" style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:8px;display:none"></div>
@@ -2303,40 +2303,52 @@ function btFilter(f, el) {
   renderTradeList(f);
 }
 
-// ── File loader ────────────────────────────────────────────
-function btLoadFile(input) {
-  const file=input.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const text=e.target.result;
-    btRawCandles=parseHistdataCSV(text);
-    const info=document.getElementById('bt-file-info');
-    if(btRawCandles.length>0){
-      const from=btRawCandles[0].dt.toISOString().slice(0,10);
-      const to=btRawCandles[btRawCandles.length-1].dt.toISOString().slice(0,10);
-      info.style.display='block';
-      info.textContent=`✓ Načteno ${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
-      document.getElementById('bt-run-btn').disabled=false;
-      document.getElementById('bt-drop').querySelector('.bt-upload-label').innerHTML=
-        `<strong style="color:var(--bull)">✓ ${file.name}</strong><br>${btRawCandles.length.toLocaleString()} svíček načteno`;
-    } else {
-      info.style.display='block';
-      info.style.color='var(--bear)';
-      info.textContent='⚠ Nepodařilo se načíst CSV. Zkontroluj formát.';
-    }
-  };
-  reader.readAsText(file);
+// ── File loader – multi-file (merge více CSV) ──────────────
+function btLoadFiles(input) {
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  const info = document.getElementById('bt-file-info');
+  info.style.display='block';
+  info.style.color='var(--accent)';
+  info.textContent=`⏳ Načítám ${files.length} souborů...`;
+  btRawCandles = [];
+
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const parsed = parseHistdataCSV(e.target.result);
+      btRawCandles = btRawCandles.concat(parsed);
+      loaded++;
+      if(loaded === files.length) {
+        // Seřaď a deduplikuj
+        btRawCandles.sort((a,b)=>a.dt-b.dt);
+        // Odstraň duplicity (stejný timestamp)
+        btRawCandles = btRawCandles.filter((c,i)=>
+          i===0 || c.dt.getTime()!==btRawCandles[i-1].dt.getTime()
+        );
+        const from = btRawCandles[0].dt.toISOString().slice(0,10);
+        const to   = btRawCandles[btRawCandles.length-1].dt.toISOString().slice(0,10);
+        info.textContent = `✓ ${files.length} souborů | ${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
+        document.getElementById('bt-run-btn').disabled = false;
+        document.getElementById('bt-drop').querySelector('.bt-upload-label').innerHTML =
+          `<strong style="color:var(--bull)">✓ ${files.length} souborů načteno</strong><br>` +
+          files.map(f=>f.name).join('<br>') +
+          `<br><span style="color:var(--accent)">${btRawCandles.length.toLocaleString()} svíček celkem</span>`;
+      }
+    };
+    reader.readAsText(file);
+  });
 }
 
-// Drag & drop
+// Drag & drop (multi)
 document.getElementById('bt-drop').addEventListener('dragover',e=>{e.preventDefault();e.currentTarget.classList.add('drag');});
 document.getElementById('bt-drop').addEventListener('dragleave',e=>e.currentTarget.classList.remove('drag'));
 document.getElementById('bt-drop').addEventListener('drop',e=>{
   e.preventDefault(); e.currentTarget.classList.remove('drag');
-  const f=e.dataTransfer.files[0]; if(!f) return;
-  document.getElementById('bt-file').files=e.dataTransfer.files;
-  btLoadFile(document.getElementById('bt-file'));
+  if(!e.dataTransfer.files.length) return;
+  document.getElementById('bt-file').files = e.dataTransfer.files;
+  btLoadFiles(document.getElementById('bt-file'));
 });
 
 </script>

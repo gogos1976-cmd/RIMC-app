@@ -629,6 +629,12 @@ body::before {
       </div>
     </div>
 
+    <!-- TRADE MANAGER -->
+    <div class="section">
+      <div class="section-title">Aktivní obchod</div>
+      <div id="trade-manager"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:8px">Žádný aktivní obchod.</div></div>
+    </div>
+
     <!-- PHASES -->
     <div class="section">
       <div class="section-title">Fáze strategie</div>
@@ -850,8 +856,47 @@ body::before {
             <option value="standard">Standard only</option>
           </select>
         </div>
+        <div class="bt-ctrl">
+          <label>Spread simulace (pipy)</label>
+          <select id="bt-spread">
+            <option value="0">0p (ideální)</option>
+            <option value="1">1p (ECN)</option>
+            <option value="2" selected>2p (standard)</option>
+            <option value="3">3p (retail)</option>
+            <option value="5">5p (konzervativní)</option>
+          </select>
+        </div>
+        <div class="bt-ctrl">
+          <label>Slippage (pipy)</label>
+          <select id="bt-slippage">
+            <option value="0">0p (ideální)</option>
+            <option value="0.5" selected>0.5p (standard)</option>
+            <option value="1">1p (konzervativní)</option>
+            <option value="2">2p (pesimistický)</option>
+          </select>
+        </div>
+        <div class="bt-ctrl">
+          <label>Komisní náklady</label>
+          <select id="bt-commission">
+            <option value="0">$0 (market maker)</option>
+            <option value="3.5" selected>$3.5/lot (ECN)</option>
+            <option value="7">$7/lot (vyšší)</option>
+          </select>
+        </div>
+        <div class="bt-ctrl">
+          <label>Min SL velikost (pipy)</label>
+          <select id="bt-minsl">
+            <option value="5">5p</option>
+            <option value="10" selected>10p</option>
+            <option value="15">15p</option>
+            <option value="20">20p</option>
+          </select>
+        </div>
       </div>
 
+      <div id="bt-realism-info" style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:6px;padding:10px 12px;margin-bottom:10px;font-family:var(--mono);font-size:10px;color:var(--text-dim);line-height:1.7;display:none">
+        <span style="color:var(--accent)">⚙ Realism faktor:</span> <span id="bt-realism-summary">–</span>
+      </div>
       <button class="bt-run-btn" id="bt-run-btn" onclick="runBacktest()" disabled>▶ SPUSTIT BACKTEST</button>
       <div class="bt-progress" id="bt-progress"><div class="bt-progress-fill" id="bt-prog-fill"></div></div>
 
@@ -1121,11 +1166,17 @@ function renderAlerts() {
       <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:10px">
         ${a.lot} lot <span style="font-size:12px;color:var(--text-dim)">/ Risk $${a.riskAmt}</span>
       </div>
-      <div class="alert-levels">
+      <div class="alert-levels" style="grid-template-columns:1fr 1fr 1fr 1fr">
         <div class="alert-lev"><label>ENTRY</label><value style="color:var(--accent)">${fmt5(a.entry)}</value></div>
         <div class="alert-lev"><label>TP (+${a.tpPips}p)</label><value style="color:var(--bull)">${fmt5(a.tp)}</value></div>
         <div class="alert-lev"><label>SL (${a.slPips}p)</label><value style="color:var(--bear)">${fmt5(a.sl)}</value></div>
+        <div class="alert-lev"><label>MAX R ↑</label><value style="color:var(--accent2)">${a.maxR!=null?a.maxR.toFixed(2)+'R':'–'}</value></div>
       </div>
+      ${a.maxR!=null?`<div style="display:grid;grid-template-columns:1fr 1fr ${a.partialPct?'1fr':''};gap:8px;margin:8px 0;padding:8px;background:var(--bg);border-radius:6px;font-family:var(--mono)">
+        <div><div style="font-size:9px;color:var(--text-dim)">MAX R ↑</div><div style="font-size:15px;font-weight:700;color:var(--bull)">${(+a.maxR).toFixed(2)}R</div></div>
+        <div><div style="font-size:9px;color:var(--text-dim)">EXIT R</div><div style="font-size:15px;font-weight:700;color:var(--text)">${a.exitR!=null?(+a.exitR).toFixed(2)+'R':'–'}</div></div>
+        ${a.partialPct?`<div><div style="font-size:9px;color:var(--text-dim)">PARTIAL</div><div style="font-size:15px;font-weight:700;color:var(--accent2)">${a.partialPct}%</div></div>`:''}
+      </div>`:''}
       <div class="alert-result-row">${resultBtns}</div>
     </div>`;
   }).join('');
@@ -1732,6 +1783,10 @@ function analyze(h1, m15, m5) {
     if(lastSignalHash !== sigHashBull) {
       lastSignalHash = sigHashBull;
       fireAlert('BULL', price, tp, sl, conf, isPremium);
+      if(!activeTrade) {
+        const lot = calcLotSize(price, sl);
+        openTrade('BULL', price, sl, tp, lot, isPremium);
+      }
     }
     log(`🟢 ${isPremium?'★ PREMIUM':'STANDARD'} BUY @ ${fmt(price)} | TP:${fmt(tp)} SL:${fmt(sl)}`, 'bull');
   } else if(isPremiumBear || isStandardBear){
@@ -1751,6 +1806,10 @@ function analyze(h1, m15, m5) {
     if(lastSignalHash !== sigHashBear) {
       lastSignalHash = sigHashBear;
       fireAlert('BEAR', price, tp, sl, conf, isPremium);
+      if(!activeTrade) {
+        const lot = calcLotSize(price, sl);
+        openTrade('BEAR', price, sl, tp, lot, isPremium);
+      }
     }
     log(`🔴 ${isPremium?'★ PREMIUM':'STANDARD'} SELL @ ${fmt(price)} | TP:${fmt(tp)} SL:${fmt(sl)}`, 'bear');
   } else {
@@ -1856,6 +1915,8 @@ async function fetchAndAnalyze(){
 
     log(`Data aktualizována${isDemo?' [DEMO]':''}@${new Date().toLocaleTimeString('cs-CZ')}`,'info');
     analyze(h1,m15,m5);
+    // Trade management – předej aktuální cenu a M5 svíčky
+    if(activeTrade) manageTrade(price, m5);
   } catch(e){
     log(`Chyba: ${e.message}`,'bear');
     $('api-notice').style.display='block';
@@ -2082,10 +2143,16 @@ function runBacktest() {
 
   // Async aby UI nezamrzlo
   setTimeout(()=>{
-    const tfMin     = parseInt(document.getElementById('bt-tf').value);
-    const rrRatio   = parseFloat(document.getElementById('bt-rr').value);
-    const sessFilter= document.getElementById('bt-session').value;
-    const setupFilter=document.getElementById('bt-setup').value;
+    const tfMin      = parseInt(document.getElementById('bt-tf').value);
+    const rrRatio    = parseFloat(document.getElementById('bt-rr').value);
+    const sessFilter = document.getElementById('bt-session').value;
+    const setupFilter= document.getElementById('bt-setup').value;
+    const spreadPips = parseFloat(document.getElementById('bt-spread').value);
+    const slippagePips=parseFloat(document.getElementById('bt-slippage').value);
+    const commission = parseFloat(document.getElementById('bt-commission').value);
+    const minSLpips  = parseFloat(document.getElementById('bt-minsl').value);
+    const totalCostPips = spreadPips + slippagePips; // celkové náklady na vstup v pipech
+    const pipValue   = 10; // $10/pip pro 1 lot GBPUSD USD účet
 
     // Resample na zvolený TF
     const candles5  = resampleCandles(btRawCandles, 5);
@@ -2137,20 +2204,22 @@ function runBacktest() {
       if(setupFilter==='premium' && !isPremium) continue;
       if(setupFilter==='standard' && isPremium) continue;
 
-      // Vypočítej SL/TP
+      // Vypočítej SL/TP s realism faktorem
       const dir  = init.direction;
       let entry, sl, tp;
+      const spreadDecimal  = spreadPips  * 0.0001;
+      const slippageDecimal= slippagePips* 0.0001;
       if(dir==='BULL'){
-        entry = price;
+        entry = price + spreadDecimal + slippageDecimal; // horší entry kvůli spreadu
         sl    = activeOB.bottom - atr*0.2;
         tp    = entry + (entry-sl)*rrRatio;
       } else {
-        entry = price;
+        entry = price - spreadDecimal - slippageDecimal; // horší entry kvůli spreadu
         sl    = activeOB.top + atr*0.2;
         tp    = entry - (sl-entry)*rrRatio;
       }
       const slPips = Math.abs(entry-sl)*10000;
-      if(slPips<3 || slPips>80) continue; // filtr nereálných SL
+      if(slPips < minSLpips || slPips > 80) continue; // filtr dle min SL nastavení
 
       // Simuluj výsledek – hledej hit v následujících svíčkách (max 48h = 192×M15)
       let result='open', exitDt=null, exitPrice=null;
@@ -2166,12 +2235,17 @@ function runBacktest() {
       }
       if(result==='open') continue; // nevyhodnocený obchod – přeskoč
 
-      const rPnl = result==='tp' ? rrRatio : -1;
+      // Komisní náklady v R (commission / (slPips × pipValue × lot))
+      // Zjednodušení: odečteme komisní náklady jako podíl R
+      const lot = CONFIG.balance * (CONFIG.riskPct/100) / (slPips * pipValue);
+      const commissionR = commission * lot * 2 / (CONFIG.balance * CONFIG.riskPct/100); // round-trip
+      const rPnl = (result==='tp' ? rrRatio : -1) - commissionR;
 
       btTrades.push({
         dt, exitDt, dir, entry, sl, tp, slPips: slPips.toFixed(1),
-        result, rPnl, isPremium,
+        result, rPnl: parseFloat(rPnl.toFixed(3)), isPremium,
         month: dt.toISOString().slice(0,7),
+        spread: spreadPips, slippage: slippagePips, commission,
       });
 
       // Přeskoč dalších min 4h aby nedošlo k duplicitám ze stejné zóny
@@ -2180,7 +2254,7 @@ function runBacktest() {
 
     progFill.style.width='80%';
     renderBacktestResults(rrRatio);
-    captureBacktestResult(btTrades, rrRatio, tfMin, sessFilter, setupFilter);
+    captureBacktestResult(btTrades, rrRatio, tfMin, sessFilter, setupFilter, spreadPips, slippagePips, commission);
     progFill.style.width='100%';
     setTimeout(()=>{ prog.style.display='none'; btn.disabled=false; }, 500);
   }, 50);
@@ -2497,7 +2571,7 @@ function renderCompareTable() {
 }
 
 // Zavolej po dokončení backttestu – ulož výsledek do btLastResult
-function captureBacktestResult(trades, rrRatio, tfMin, sessFilter, setupFilter) {
+function captureBacktestResult(trades, rrRatio, tfMin, sessFilter, setupFilter, spreadPips=2, slippagePips=0.5, commission=3.5) {
   const tp    = trades.filter(t=>t.result==='tp').length;
   const sl    = trades.filter(t=>t.result==='sl').length;
   const total = tp+sl;
@@ -2515,7 +2589,7 @@ function captureBacktestResult(trades, rrRatio, tfMin, sessFilter, setupFilter) 
   const premWR = premTrades.length>0 ? premTP/premTrades.length*100 : null;
 
   const sessLabels = {all:'Vše',london:'London',ny:'NY',both:'LON+NY'};
-  const params = `M${tfMin} RR${rrRatio} ${sessLabels[sessFilter]} ${setupFilter==='all'?'':setupFilter}`.trim();
+  const params = `M${tfMin} RR${rrRatio} ${sessLabels[sessFilter]} Sp${spreadPips}p Slip${slippagePips}p ${setupFilter==='all'?'':setupFilter}`.trim();
 
   btLastResult = { wr, pf, netR, dd, total, premWR, params,
     from: trades[0]?.dt.toISOString().slice(0,10) || '–',
@@ -2593,6 +2667,341 @@ async function loadFromGitHub() {
 
   log(`✓ GitHub data načtena: ${btRawCandles.length.toLocaleString()} svíček (${from}→${to})`, 'info');
 }
+
+
+// Aktualizuj realism info box při změně parametrů
+function updateRealismInfo() {
+  const spread     = parseFloat(document.getElementById('bt-spread')?.value || 2);
+  const slippage   = parseFloat(document.getElementById('bt-slippage')?.value || 0.5);
+  const commission = parseFloat(document.getElementById('bt-commission')?.value || 3.5);
+  const minSL      = parseFloat(document.getElementById('bt-minsl')?.value || 10);
+  const info = document.getElementById('bt-realism-info');
+  const summary = document.getElementById('bt-realism-summary');
+  if(!info || !summary) return;
+  const totalCost = spread + slippage;
+  info.style.display = 'block';
+  summary.innerHTML = `Spread: <span style="color:var(--text)">${spread}p</span> · Slippage: <span style="color:var(--text)">${slippage}p</span> · Komise: <span style="color:var(--text)">$${commission}/lot</span> · Min SL: <span style="color:var(--text)">${minSL}p</span> · Celkem vstupní náklady: <span style="color:var(--accent2)">${totalCost}p</span>`;
+}
+
+// Attach listeners
+['bt-spread','bt-slippage','bt-commission','bt-minsl'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', updateRealismInfo);
+});
+updateRealismInfo();
+
+
+// ============================================================
+// POKROČILÉ ŘÍZENÍ TRADE – Trailing & Partial Close
+// ============================================================
+
+// Aktivní obchod state
+let activeTrade = null;
+
+// ── Fractal detekce (Williams fractal – 2 svíčky vlevo/vpravo) ──
+function detectFractals(candles) {
+  const highs = [], lows = [];
+  for(let i=2; i<candles.length-2; i++){
+    const h = candles[i].high, l = candles[i].low;
+    if(h > candles[i-1].high && h > candles[i-2].high &&
+       h > candles[i+1].high && h > candles[i+2].high)
+      highs.push({ idx:i, level:h });
+    if(l < candles[i-1].low && l < candles[i-2].low &&
+       l < candles[i+1].low && l < candles[i+2].low)
+      lows.push({ idx:i, level:l });
+  }
+  return { highs, lows };
+}
+
+// ── Agresivní trend detekce (min 2/3 podmínek) ──────────────
+function isAggressiveTrend(m5Candles, direction) {
+  const closes = m5Candles.map(c=>c.close);
+  const highs  = m5Candles.map(c=>c.high);
+  const lows   = m5Candles.map(c=>c.low);
+  const n = closes.length;
+  const price = closes[n-1];
+
+  const ema50  = calcEMA(closes, 50);
+  const ema200 = calcEMA(closes, 200);
+
+  // Podmínka A: EMA50 vs EMA200
+  const condA = direction==='BULL' ? ema50 > ema200 : ema50 < ema200;
+
+  // Podmínka B: Cena na správné straně EMA50
+  const condB = direction==='BULL' ? price > ema50 : price < ema50;
+
+  // Podmínka C: Poslední BOS svíčka je impulzivní
+  // Průměrná velikost posledních 5 svíček
+  const avg5 = closes.slice(-6,-1).map((c,i,a)=>
+    Math.abs(c - (i>0?a[i-1]:closes[n-7]))).reduce((a,b)=>a+b,0) / 5;
+  const lastBody = Math.abs(closes[n-1] - m5Candles[n-1].open);
+  const condC = lastBody > avg5;
+
+  const score = [condA, condB, condC].filter(Boolean).length;
+  return {
+    isAggressive: score >= 2,
+    score,
+    condA, condB, condC,
+    ema50, ema200,
+  };
+}
+
+// ── Trailing SL po fractal + BOS (M5) ───────────────────────
+function calcTrailingSL(m5Candles, direction, currentSL, bufferPips=3) {
+  const buffer = bufferPips * 0.0001;
+  const { highs, lows } = detectFractals(m5Candles);
+  const n = m5Candles.length;
+  const closes = m5Candles.map(c=>c.close);
+
+  if(direction === 'BULL') {
+    // Najdi poslední potvrzený fractal low
+    if(!lows.length) return { newSL: currentSL, bosDetected: false };
+    const lastFractalLow = lows[lows.length-1];
+
+    // Najdi poslední relevantní swing high (po fractal low)
+    const recentHighs = highs.filter(h=>h.idx > lastFractalLow.idx);
+    if(!recentHighs.length) return { newSL: currentSL, bosDetected: false };
+    const swingHigh = recentHighs[recentHighs.length-1].level;
+
+    // BOS = svíčka uzavřela nad swing high
+    const bosConfirmed = closes[n-1] > swingHigh;
+    if(!bosConfirmed) return { newSL: currentSL, bosDetected: false };
+
+    // Nový SL = fractal low - buffer
+    const newSL = lastFractalLow.level - buffer;
+    // Posun jen pokud je nový SL vyšší než aktuální
+    return {
+      newSL: newSL > currentSL ? newSL : currentSL,
+      bosDetected: true,
+      fractalLevel: lastFractalLow.level,
+      swingHigh,
+    };
+
+  } else { // BEAR
+    if(!highs.length) return { newSL: currentSL, bosDetected: false };
+    const lastFractalHigh = highs[highs.length-1];
+
+    const recentLows = lows.filter(l=>l.idx > lastFractalHigh.idx);
+    if(!recentLows.length) return { newSL: currentSL, bosDetected: false };
+    const swingLow = recentLows[recentLows.length-1].level;
+
+    const bosConfirmed = closes[n-1] < swingLow;
+    if(!bosConfirmed) return { newSL: currentSL, bosDetected: false };
+
+    const newSL = lastFractalHigh.level + buffer;
+    return {
+      newSL: newSL < currentSL ? newSL : currentSL,
+      bosDetected: true,
+      fractalLevel: lastFractalHigh.level,
+      swingLow,
+    };
+  }
+}
+
+// ── Hlavní trade management funkce ──────────────────────────
+// Voláno při každém refreshi pokud existuje aktivní obchod
+function manageTrade(currentPrice, m5Candles) {
+  if(!activeTrade) return;
+
+  const t = activeTrade;
+  const dir = t.direction;
+  const BE_BUFFER = 0.0001; // 1 pip
+  const risk = Math.abs(t.entry - t.sl); // 1R v ceně
+
+  // Výpočet aktuálního R
+  const currentR = dir==='BULL'
+    ? (currentPrice - t.entry) / risk
+    : (t.entry - currentPrice) / risk;
+
+  t.currentR = currentR;
+
+  // Sleduj Maximum Favorable Excursion
+  if(currentR > (t.maxR || 0)) {
+    t.maxR = currentR;
+    localStorage.setItem('rimc_active_trade', JSON.stringify(activeTrade));
+  }
+
+  // ── FÁZE 2: při 1R → BE + 1 pip ────────────────────────────
+  if(!t.beActivated && currentR >= 1.0) {
+    const newSL = dir==='BULL'
+      ? t.entry + BE_BUFFER
+      : t.entry - BE_BUFFER;
+
+    // Posun jen pokud je to lepší než aktuální SL
+    if((dir==='BULL' && newSL > t.sl) || (dir==='BEAR' && newSL < t.sl)) {
+      t.sl = newSL;
+      t.beActivated = true;
+      const msg = `🔒 BE aktivován @ ${t.entry.toFixed(5)} +1p | Aktuální R: ${currentR.toFixed(2)}`;
+      log(msg, 'info');
+      fireTradeNotification('BE', t, msg);
+      renderTradeManager();
+    }
+  }
+
+  // ── FÁZE 3: při 2R → partial close + agresivita ────────────
+  if(!t.partialClosed && currentR >= 2.0) {
+    const trendInfo = isAggressiveTrend(m5Candles, dir);
+    const closePct  = trendInfo.isAggressive ? 30 : 50;
+    const remainPct = 100 - closePct;
+
+    t.partialClosed   = true;
+    t.partialClosePct = closePct;
+    t.trendInfo       = trendInfo;
+    t.trailingActive  = true; // aktivuj trailing
+
+    const msg = `📊 ${trendInfo.isAggressive?'AGRESIVNÍ':'STANDARD'} trend (${trendInfo.score}/3) | Partial close ${closePct}% @ 2R | Trailing aktivován`;
+    log(msg, trendInfo.isAggressive ? 'bull' : 'info');
+    fireTradeNotification('PARTIAL', t, msg);
+    renderTradeManager();
+  }
+
+  // ── FÁZE 4: od 2R → structure trailing (fractal + BOS) ─────
+  if(t.trailingActive && currentR >= 2.0) {
+    const trailing = calcTrailingSL(m5Candles, dir, t.sl, 3);
+    if(trailing.bosDetected && trailing.newSL !== t.sl) {
+      const oldSL = t.sl;
+      t.sl = trailing.newSL;
+      t.trailingHistory = t.trailingHistory || [];
+      t.trailingHistory.push({ r: currentR.toFixed(2), newSL: t.sl, fractal: trailing.fractalLevel });
+
+      const msg = `📈 Trailing SL posun: ${oldSL.toFixed(5)} → ${t.sl.toFixed(5)} | BOS fractal @ ${trailing.fractalLevel?.toFixed(5)} | R: ${currentR.toFixed(2)}`;
+      log(msg, 'bull');
+      fireTradeNotification('TRAIL', t, msg);
+      renderTradeManager();
+    }
+  }
+
+  // ── Kontrola SL hitu ───────────────────────────────────────
+  if((dir==='BULL' && currentPrice <= t.sl) ||
+     (dir==='BEAR' && currentPrice >= t.sl)) {
+    const finalR = t.currentR.toFixed(2);
+    log(`❌ SL HIT @ ${currentPrice.toFixed(5)} | Final R: ${finalR}`, 'bear');
+    fireTradeNotification('SL_HIT', t, `SL zasažen @ ${currentPrice.toFixed(5)} | R: ${finalR}`);
+    closeTrade('sl');
+    return;
+  }
+
+  // ── Kontrola TP hitu ──────────────────────────────────────
+  if((dir==='BULL' && currentPrice >= t.tp) ||
+     (dir==='BEAR' && currentPrice <= t.tp)) {
+    const finalR = t.currentR.toFixed(2);
+    log(`✅ TP HIT @ ${currentPrice.toFixed(5)} | Final R: ${finalR}`, 'bull');
+    fireTradeNotification('TP_HIT', t, `TP zasažen @ ${currentPrice.toFixed(5)} | R: ${finalR}`);
+    closeTrade('tp');
+    return;
+  }
+
+  renderTradeManager();
+}
+
+function openTrade(direction, entry, sl, tp, lot, isPremium) {
+  activeTrade = {
+    direction, entry, sl, tp, lot, isPremium,
+    originalSL: sl, originalTP: tp,
+    beActivated: false,
+    partialClosed: false,
+    trailingActive: false,
+    trailingHistory: [],
+    currentR: 0,
+    maxR: 0,        // Maximum Favorable Excursion
+    openTime: new Date().toISOString(),
+  };
+  localStorage.setItem('rimc_active_trade', JSON.stringify(activeTrade));
+  log(`🟢 Trade otevřen: ${direction} @ ${entry.toFixed(5)} | SL: ${sl.toFixed(5)} | TP: ${tp.toFixed(5)} | Lot: ${lot}`, direction==='BULL'?'bull':'bear');
+  renderTradeManager();
+}
+
+function closeTrade(result) {
+  if(!activeTrade) return;
+  // Ulož do alert history jako výsledek + maxR
+  const existing = alertHistory.find(a =>
+    Math.abs(a.entry - activeTrade.entry) < 0.0001 && !a.result
+  );
+  if(existing) {
+    existing.maxR     = activeTrade.maxR || 0;
+    existing.exitR    = activeTrade.currentR || 0;
+    existing.partialPct = activeTrade.partialClosePct || null;
+    setAlertResult(existing.id, result);
+  }
+  activeTrade = null;
+  localStorage.removeItem('rimc_active_trade');
+  renderTradeManager();
+}
+
+function fireTradeNotification(type, trade, msg) {
+  // Push notifikace
+  if('Notification' in window && Notification.permission==='granted') {
+    try { new Notification(titles[type]||type, { body:msg, icon:'./icon-192.png', tag:'rimc-trade' }); } catch(e){}
+  }
+}
+
+// ── Trade Manager UI ─────────────────────────────────────────
+function renderTradeManager() {
+  const el = document.getElementById('trade-manager');
+  if(!el) return;
+
+  if(!activeTrade) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:8px">Žádný aktivní obchod.</div>';
+    return;
+  }
+
+  const t = activeTrade;
+  const dir = t.direction;
+  const isBull = dir==='BULL';
+  const risk = Math.abs(t.entry - t.originalSL);
+  const rColor = t.currentR>=2?'var(--bull)':t.currentR>=1?'var(--accent)':t.currentR>=0?'var(--text)':'var(--bear)';
+  const phase = !t.beActivated?'Fáze 1 – Čekám 1R':
+                !t.partialClosed?'Fáze 2 – BE aktivován, čekám 2R':
+                t.trailingActive?'Fáze 3/4 – Trailing aktivní':'Fáze 3 – Partial close';
+
+  const trailRows = (t.trailingHistory||[]).slice(-3).reverse().map(h=>
+    `<div style="font-family:var(--mono);font-size:9px;color:var(--text-dim)">R:${h.r} → SL:${(+h.newSL).toFixed(5)}</div>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="alert-card ${isBull?'bull':'bear'}" style="margin-bottom:0">
+      <div class="alert-header">
+        <div>
+          <span class="alert-dir ${isBull?'bull':'bear'}">${isBull?'▲ LONG':'▼ SHORT'}${t.isPremium?' ★':''}</span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-left:8px">${phase}</span>
+        </div>
+        <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:${rColor}">${(t.currentR||0).toFixed(2)}R</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:10px">
+        ${t.lot} lot
+      </div>
+      <div class="alert-levels" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div class="alert-lev"><label>ENTRY</label><value style="color:var(--accent)">${t.entry.toFixed(5)}</value></div>
+        <div class="alert-lev"><label>TP</label><value style="color:var(--bull)">${t.tp.toFixed(5)}</value></div>
+        <div class="alert-lev"><label>SL ${t.beActivated?'(BE)':''}</label><value style="color:var(--bear)">${t.sl.toFixed(5)}</value></div>
+        <div class="alert-lev"><label>MAX R ↑</label><value style="color:var(--accent2)">${(t.maxR||0).toFixed(2)}R</value></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;padding:8px;background:var(--bg);border-radius:6px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:1.5px">MAX R ↑</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--bull)">${(t.maxR||0).toFixed(2)}R</div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:1.5px">AKTUÁLNÍ R</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:${rColor}">${(t.currentR||0).toFixed(2)}R</div>
+        </div>
+      </div>
+      ${t.partialClosed?`
+      <div style="font-family:var(--mono);font-size:10px;color:var(--accent2);margin:8px 0">
+        ✂ Partial close ${t.partialClosePct}% @ 2R | ${t.trendInfo?.isAggressive?'AGRESIVNÍ':'STANDARD'} trend (${t.trendInfo?.score}/3)
+      </div>`:''}
+      ${trailRows?`<div style="margin-top:6px">${trailRows}</div>`:''}
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="result-btn" style="flex:1" onclick="closeTrade('tp')">✓ ZAVŘÍT TP</button>
+        <button class="result-btn" style="flex:1" onclick="closeTrade('sl')">✗ ZAVŘÍT SL</button>
+        <button class="result-btn" style="flex:1" onclick="closeTrade('be')">→ ZAVŘÍT BE</button>
+      </div>
+    </div>`;
+}
+
+// Načti aktivní trade z localStorage při startu
+const savedTrade = localStorage.getItem('rimc_active_trade');
+if(savedTrade) { try { activeTrade = JSON.parse(savedTrade); } catch(e){} }
 
 </script>
 </body>

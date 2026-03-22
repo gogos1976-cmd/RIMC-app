@@ -791,6 +791,18 @@ body::before {
       <div class="section-title">Backtest – RIMC GBPUSD</div>
 
       <!-- UPLOAD -->
+      <!-- NAČÍST Z GITHUBU -->
+      <div style="margin-bottom:10px">
+        <button class="bt-run-btn" style="background:var(--bg3);color:var(--accent);border:1px solid rgba(0,229,255,.3);margin-bottom:6px" onclick="loadFromGitHub()">
+          ⬇ NAČÍST DATA Z GITHUBU (2023+2024+2025)
+        </button>
+        <div id="bt-github-progress" style="display:none">
+          <div class="bt-progress" style="display:block"><div class="bt-progress-fill" id="bt-gh-fill"></div></div>
+          <div id="bt-github-status" style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-top:4px"></div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:8px">── nebo nahraj manuálně ──</div>
+
       <div class="bt-upload-zone" id="bt-drop" onclick="document.getElementById('bt-file').click()">
         <input type="file" id="bt-file" accept=".csv,.txt" multiple onchange="btLoadFiles(this)">
         <div class="bt-upload-icon">📂</div>
@@ -2514,6 +2526,73 @@ function captureBacktestResult(trades, rrRatio, tfMin, sessFilter, setupFilter) 
 
 // Init
 renderCompareTable();
+
+
+// ============================================================
+// NAČTENÍ DAT PŘÍMO Z GITHUBU
+// ============================================================
+const GITHUB_BASE = 'https://raw.githubusercontent.com/gogos1976-cmd/RIMC-app/main/';
+const GITHUB_FILES = [
+  'DAT_ASCII_GBPUSD_M1_2023.csv',
+  'DAT_ASCII_GBPUSD_M1_2024.csv',
+  'DAT_ASCII_GBPUSD_M1_2025.csv',
+];
+
+async function loadFromGitHub() {
+  const progWrap  = document.getElementById('bt-github-progress');
+  const progFill  = document.getElementById('bt-gh-fill');
+  const statusEl  = document.getElementById('bt-github-status');
+  const runBtn    = document.getElementById('bt-run-btn');
+
+  progWrap.style.display = 'block';
+  btRawCandles = [];
+
+  for(let i=0; i<GITHUB_FILES.length; i++){
+    const fname = GITHUB_FILES[i];
+    const pct   = Math.round((i/GITHUB_FILES.length)*80);
+    progFill.style.width = pct + '%';
+    statusEl.textContent = `⬇ Načítám ${fname}... (${i+1}/${GITHUB_FILES.length})`;
+
+    try {
+      const res  = await fetch(GITHUB_BASE + fname);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      const parsed = parseHistdataCSV(text);
+      btRawCandles = btRawCandles.concat(parsed);
+      statusEl.textContent = `✓ ${fname} – ${parsed.length.toLocaleString()} svíček`;
+    } catch(e) {
+      statusEl.textContent = `⚠ Chyba: ${fname} – ${e.message}`;
+      statusEl.style.color = 'var(--bear)';
+      progWrap.style.display = 'none';
+      return;
+    }
+  }
+
+  // Seřaď a deduplikuj
+  btRawCandles.sort((a,b)=>a.dt-b.dt);
+  btRawCandles = btRawCandles.filter((c,i)=>
+    i===0 || c.dt.getTime()!==btRawCandles[i-1].dt.getTime()
+  );
+
+  progFill.style.width = '100%';
+  const from = btRawCandles[0].dt.toISOString().slice(0,10);
+  const to   = btRawCandles[btRawCandles.length-1].dt.toISOString().slice(0,10);
+  statusEl.textContent = `✓ Načteno ${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
+  statusEl.style.color = 'var(--bull)';
+
+  // Update upload zóny
+  document.getElementById('bt-drop').querySelector('.bt-upload-label').innerHTML =
+    `<strong style="color:var(--bull)">✓ GitHub data načtena</strong><br>` +
+    `${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
+  document.getElementById('bt-file-info').style.display = 'block';
+  document.getElementById('bt-file-info').textContent =
+    `✓ 3 roky GBPUSD M1 dat | ${btRawCandles.length.toLocaleString()} svíček`;
+
+  runBtn.disabled = false;
+  setTimeout(()=>{ progWrap.style.display='none'; }, 2000);
+
+  log(`✓ GitHub data načtena: ${btRawCandles.length.toLocaleString()} svíček (${from}→${to})`, 'info');
+}
 
 </script>
 </body>

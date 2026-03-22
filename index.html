@@ -518,6 +518,49 @@ body::before {
 .bt-trade-result.be { color:var(--accent); }
 .bt-trade-meta { color:var(--text-dim); display:flex; gap:10px; flex-wrap:wrap; }
 
+
+/* BACKTEST COMPARE */
+.bt-saved-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+.bt-save-btn {
+  background:rgba(0,229,255,.1); border:1px solid rgba(0,229,255,.3);
+  color:var(--accent); font-family:var(--mono); font-size:10px;
+  padding:6px 12px; border-radius:4px; cursor:pointer;
+}
+.bt-save-btn:disabled { opacity:.3; cursor:not-allowed; }
+.bt-compare-wrap { overflow-x:auto; margin-bottom:12px; }
+.bt-compare-table {
+  width:100%; border-collapse:collapse;
+  font-family:var(--mono); font-size:10px; min-width:520px;
+}
+.bt-compare-table th {
+  background:var(--bg3); color:var(--text-dim);
+  padding:7px 10px; text-align:left;
+  border-bottom:1px solid var(--border);
+  letter-spacing:1px; font-weight:400;
+  white-space:nowrap;
+}
+.bt-compare-table td {
+  padding:7px 10px; border-bottom:1px solid rgba(30,45,61,.5);
+  white-space:nowrap;
+}
+.bt-compare-table tr:hover td { background:rgba(255,255,255,.02); }
+.bt-compare-table .best { color:var(--bull); font-weight:700; }
+.bt-compare-table .worst { color:var(--bear); }
+.bt-del-btn {
+  background:none; border:none; color:var(--text-dim);
+  cursor:pointer; font-size:12px; padding:2px 6px;
+}
+.bt-del-btn:hover { color:var(--bear); }
+.bt-name-input {
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--text); font-family:var(--mono); font-size:11px;
+  padding:7px 10px; border-radius:5px; outline:none; width:100%;
+  margin-bottom:8px;
+}
+
 </style>
 </head>
 <body>
@@ -840,6 +883,19 @@ body::before {
         <div id="bt-trade-list"></div>
 
       </div><!-- /bt-results -->
+
+      <!-- SAVE + COMPARE -->
+      <div style="margin-top:16px">
+        <div class="bt-saved-header">
+          <div class="section-title" style="margin:0">Uložené backtesty</div>
+          <button class="bt-save-btn" id="bt-save-btn" onclick="saveBacktest()" disabled>💾 ULOŽIT</button>
+        </div>
+        <input class="bt-name-input" id="bt-run-name" placeholder="Název např. Premium London 2023–2025" maxlength="40">
+        <div id="bt-compare-wrap">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Zatím žádné uložené backtesty.</div>
+        </div>
+      </div>
+
     </div>
   </div><!-- /page-backtest -->
 
@@ -2112,6 +2168,7 @@ function runBacktest() {
 
     progFill.style.width='80%';
     renderBacktestResults(rrRatio);
+    captureBacktestResult(btTrades, rrRatio, tfMin, sessFilter, setupFilter);
     progFill.style.width='100%';
     setTimeout(()=>{ prog.style.display='none'; btn.disabled=false; }, 500);
   }, 50);
@@ -2350,6 +2407,113 @@ document.getElementById('bt-drop').addEventListener('drop',e=>{
   document.getElementById('bt-file').files = e.dataTransfer.files;
   btLoadFiles(document.getElementById('bt-file'));
 });
+
+
+// ============================================================
+// BACKTEST SAVE & COMPARE
+// ============================================================
+let btSaved = JSON.parse(localStorage.getItem('rimc_bt_saved') || '[]');
+let btLastResult = null; // aktuální výsledek čekající na uložení
+
+function saveBtState() {
+  localStorage.setItem('rimc_bt_saved', JSON.stringify(btSaved.slice(-10)));
+}
+
+function saveBacktest() {
+  if(!btLastResult) return;
+  const name = document.getElementById('bt-run-name').value.trim() ||
+    'Backtest ' + new Date().toLocaleDateString('cs-CZ');
+  btSaved.unshift({ ...btLastResult, name, savedAt: new Date().toISOString() });
+  saveBtState();
+  renderCompareTable();
+  document.getElementById('bt-save-btn').disabled = true;
+  document.getElementById('bt-run-name').value = '';
+  log('💾 Backtest uložen: ' + name, 'info');
+}
+
+function deleteBacktest(idx) {
+  btSaved.splice(idx, 1);
+  saveBtState();
+  renderCompareTable();
+}
+
+function renderCompareTable() {
+  const wrap = document.getElementById('bt-compare-wrap');
+  if(!btSaved.length) {
+    wrap.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Zatím žádné uložené backtesty.</div>';
+    return;
+  }
+
+  // Najdi best hodnoty pro zvýraznění
+  const best = {
+    wr:   Math.max(...btSaved.map(b=>b.wr)),
+    pf:   Math.max(...btSaved.map(b=>b.pf)),
+    netR: Math.max(...btSaved.map(b=>b.netR)),
+    dd:   Math.min(...btSaved.map(b=>b.dd)), // nejmenší DD = nejlepší
+  };
+
+  const rows = btSaved.map((b,i) => {
+    const isBestWR  = b.wr   === best.wr;
+    const isBestPF  = b.pf   === best.pf;
+    const isBestNet = b.netR === best.netR;
+    const isBestDD  = b.dd   === best.dd;
+    return `<tr>
+      <td style="color:var(--text)">${b.name}</td>
+      <td class="${isBestWR?'best':b.wr<50?'worst':''}">${b.wr.toFixed(1)}%</td>
+      <td class="${isBestPF?'best':b.pf<1?'worst':''}">${b.pf.toFixed(2)}</td>
+      <td class="${isBestNet?'best':b.netR<0?'worst':''}">${b.netR>0?'+':''}${b.netR.toFixed(1)}R</td>
+      <td class="${isBestDD?'best':b.dd>10?'worst':''}">${b.dd.toFixed(1)}R</td>
+      <td style="color:var(--text-dim)">${b.total}</td>
+      <td style="color:var(--text-dim)">${b.premWR!==null?b.premWR.toFixed(1)+'%':'–'}</td>
+      <td style="color:var(--text-dim);font-size:9px">${b.params}</td>
+      <td><button class="bt-del-btn" onclick="deleteBacktest(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `<div class="bt-compare-wrap">
+    <table class="bt-compare-table">
+      <thead><tr>
+        <th>Název</th><th>WR%</th><th>PF</th><th>Net R</th>
+        <th>Max DD</th><th>Obchody</th><th>★WR</th><th>Params</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+  <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:6px">
+    🟢 = nejlepší hodnota | max 10 uložených backtestů
+  </div>`;
+}
+
+// Zavolej po dokončení backttestu – ulož výsledek do btLastResult
+function captureBacktestResult(trades, rrRatio, tfMin, sessFilter, setupFilter) {
+  const tp    = trades.filter(t=>t.result==='tp').length;
+  const sl    = trades.filter(t=>t.result==='sl').length;
+  const total = tp+sl;
+  const wr    = total>0 ? tp/total*100 : 0;
+  const grossW= trades.filter(t=>t.result==='tp').reduce((a,t)=>a+t.rPnl,0);
+  const grossL= Math.abs(trades.filter(t=>t.result==='sl').reduce((a,t)=>a+t.rPnl,0));
+  const pf    = grossL>0 ? grossW/grossL : 99;
+  const netR  = trades.reduce((a,t)=>a+t.rPnl,0);
+
+  let peak=0,eq=0,dd=0;
+  trades.forEach(t=>{ eq+=t.rPnl; if(eq>peak)peak=eq; dd=Math.max(dd,peak-eq); });
+
+  const premTrades = trades.filter(t=>t.isPremium);
+  const premTP = premTrades.filter(t=>t.result==='tp').length;
+  const premWR = premTrades.length>0 ? premTP/premTrades.length*100 : null;
+
+  const sessLabels = {all:'Vše',london:'London',ny:'NY',both:'LON+NY'};
+  const params = `M${tfMin} RR${rrRatio} ${sessLabels[sessFilter]} ${setupFilter==='all'?'':setupFilter}`.trim();
+
+  btLastResult = { wr, pf, netR, dd, total, premWR, params,
+    from: trades[0]?.dt.toISOString().slice(0,10) || '–',
+    to:   trades[trades.length-1]?.dt.toISOString().slice(0,10) || '–' };
+
+  document.getElementById('bt-save-btn').disabled = false;
+}
+
+// Init
+renderCompareTable();
 
 </script>
 </body>

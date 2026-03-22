@@ -435,6 +435,89 @@ body::before {
   padding:5px 10px; border-radius:4px; cursor:pointer;
 }
 
+/* ── BACKTEST PAGE ── */
+.bt-upload-zone {
+  border:2px dashed var(--border); border-radius:8px;
+  padding:28px 16px; text-align:center; margin-bottom:12px;
+  transition:border-color .2s; cursor:pointer;
+}
+.bt-upload-zone.drag { border-color:var(--accent); background:rgba(0,229,255,.05); }
+.bt-upload-zone input { display:none; }
+.bt-upload-icon { font-size:32px; margin-bottom:8px; }
+.bt-upload-label { font-family:var(--mono); font-size:11px; color:var(--text-dim); line-height:1.7; }
+.bt-upload-label strong { color:var(--accent); }
+
+.bt-controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.bt-ctrl { display:flex; flex-direction:column; gap:4px; }
+.bt-ctrl label { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; }
+.bt-ctrl select, .bt-ctrl input {
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--text); font-family:var(--mono); font-size:11px;
+  padding:7px 10px; border-radius:5px; outline:none; -webkit-appearance:none;
+}
+
+.bt-run-btn {
+  width:100%; background:var(--accent); color:#000;
+  border:none; font-family:var(--mono); font-size:12px; font-weight:700;
+  padding:13px; border-radius:6px; cursor:pointer; letter-spacing:1px;
+  margin-bottom:16px; transition:opacity .2s;
+}
+.bt-run-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+.bt-progress {
+  background:var(--bg3); border-radius:6px; overflow:hidden;
+  height:4px; margin-bottom:12px; display:none;
+}
+.bt-progress-fill { height:100%; background:var(--accent); transition:width .1s; width:0%; }
+
+/* KPI GRID */
+.bt-kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.bt-kpi {
+  background:var(--bg3); border-radius:8px; padding:12px;
+  display:flex; flex-direction:column; gap:4px;
+}
+.bt-kpi-val { font-family:var(--mono); font-size:22px; font-weight:700; }
+.bt-kpi-lbl { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; }
+.bt-kpi.pos .bt-kpi-val { color:var(--bull); }
+.bt-kpi.neg .bt-kpi-val { color:var(--bear); }
+.bt-kpi.neu .bt-kpi-val { color:var(--accent); }
+.bt-kpi.warn .bt-kpi-val { color:var(--accent2); }
+
+/* EQUITY CURVE */
+.bt-chart-wrap {
+  background:var(--bg3); border-radius:8px; padding:12px;
+  margin-bottom:12px; position:relative;
+}
+.bt-chart-title { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+#bt-equity-canvas { width:100%; height:140px; display:block; }
+
+/* TRADE LIST */
+.bt-trade-filters { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+.bt-filter-btn {
+  font-family:var(--mono); font-size:9px; padding:4px 10px;
+  border-radius:3px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text-dim); cursor:pointer;
+  letter-spacing:1px;
+}
+.bt-filter-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,255,.08); }
+
+.bt-trade {
+  background:var(--bg3); border-radius:6px; padding:10px 12px;
+  margin-bottom:5px; border-left:3px solid transparent;
+  font-family:var(--mono); font-size:10px;
+}
+.bt-trade.bull { border-color:var(--bull); }
+.bt-trade.bear { border-color:var(--bear); }
+.bt-trade-header { display:flex; justify-content:space-between; margin-bottom:5px; }
+.bt-trade-dir { font-weight:700; }
+.bt-trade-dir.bull { color:var(--bull); }
+.bt-trade-dir.bear { color:var(--bear); }
+.bt-trade-result { font-weight:700; }
+.bt-trade-result.tp { color:var(--bull); }
+.bt-trade-result.sl { color:var(--bear); }
+.bt-trade-result.be { color:var(--accent); }
+.bt-trade-meta { color:var(--text-dim); display:flex; gap:10px; flex-wrap:wrap; }
+
 </style>
 </head>
 <body>
@@ -659,6 +742,107 @@ body::before {
     </div>
   </div>
 
+  <!-- PAGE: BACKTEST -->
+  <div class="page" id="page-backtest">
+    <div class="section">
+      <div class="section-title">Backtest – RIMC GBPUSD</div>
+
+      <!-- UPLOAD -->
+      <div class="bt-upload-zone" id="bt-drop" onclick="document.getElementById('bt-file').click()">
+        <input type="file" id="bt-file" accept=".csv,.txt" onchange="btLoadFile(this)">
+        <div class="bt-upload-icon">📂</div>
+        <div class="bt-upload-label">
+          <strong>Nahraj CSV z histdata.com</strong><br>
+          Formát: DAT_GBPUSD_M1_*.csv<br>
+          nebo M5/M15/H1 · až 2+ roky dat
+        </div>
+      </div>
+      <div id="bt-file-info" style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:8px;display:none"></div>
+
+      <!-- CONTROLS -->
+      <div class="bt-controls">
+        <div class="bt-ctrl">
+          <label>Timeframe svíček</label>
+          <select id="bt-tf">
+            <option value="5">M5</option>
+            <option value="15" selected>M15</option>
+            <option value="60">H1</option>
+          </select>
+        </div>
+        <div class="bt-ctrl">
+          <label>RR ratio</label>
+          <select id="bt-rr">
+            <option value="1.5">1:1.5</option>
+            <option value="2" selected>1:2</option>
+            <option value="2.5">1:2.5</option>
+            <option value="3">1:3</option>
+          </select>
+        </div>
+        <div class="bt-ctrl">
+          <label>Session filtr</label>
+          <select id="bt-session">
+            <option value="all">Vše</option>
+            <option value="london" selected>London (8–11)</option>
+            <option value="ny">New York (14:30–17:30)</option>
+            <option value="both">London + NY</option>
+          </select>
+        </div>
+        <div class="bt-ctrl">
+          <label>Typ setupu</label>
+          <select id="bt-setup">
+            <option value="all">Vše</option>
+            <option value="premium">★ Premium only</option>
+            <option value="standard">Standard only</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="bt-run-btn" id="bt-run-btn" onclick="runBacktest()" disabled>▶ SPUSTIT BACKTEST</button>
+      <div class="bt-progress" id="bt-progress"><div class="bt-progress-fill" id="bt-prog-fill"></div></div>
+
+      <!-- RESULTS (skryté dokud není backtest) -->
+      <div id="bt-results" style="display:none">
+
+        <!-- KPI -->
+        <div class="bt-kpi-grid">
+          <div class="bt-kpi pos"><div class="bt-kpi-val" id="bk-wr">–</div><div class="bt-kpi-lbl">Win Rate</div></div>
+          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-pf">–</div><div class="bt-kpi-lbl">Profit Factor</div></div>
+          <div class="bt-kpi warn"><div class="bt-kpi-val" id="bk-dd">–</div><div class="bt-kpi-lbl">Max Drawdown</div></div>
+          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-rr">–</div><div class="bt-kpi-lbl">Avg R:R</div></div>
+          <div class="bt-kpi pos"><div class="bt-kpi-val" id="bk-total">–</div><div class="bt-kpi-lbl">Celkem obchodů</div></div>
+          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-net">–</div><div class="bt-kpi-lbl">Net P&L (R)</div></div>
+          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-premium-wr">–</div><div class="bt-kpi-lbl">★ Premium WR</div></div>
+          <div class="bt-kpi warn"><div class="bt-kpi-val" id="bk-consec">–</div><div class="bt-kpi-lbl">Max ztráty v řadě</div></div>
+        </div>
+
+        <!-- EQUITY CURVE -->
+        <div class="bt-chart-wrap">
+          <div class="bt-chart-title">Equity Curve (R)</div>
+          <canvas id="bt-equity-canvas"></canvas>
+        </div>
+
+        <!-- MONTHLY BREAKDOWN -->
+        <div class="bt-chart-wrap">
+          <div class="bt-chart-title">Měsíční výsledky (R)</div>
+          <canvas id="bt-monthly-canvas" style="width:100%;height:120px;display:block"></canvas>
+        </div>
+
+        <!-- TRADE LIST -->
+        <div class="section-title" style="margin-bottom:8px">Seznam obchodů</div>
+        <div class="bt-trade-filters">
+          <button class="bt-filter-btn active" onclick="btFilter('all',this)">VŠE</button>
+          <button class="bt-filter-btn" onclick="btFilter('bull',this)">BUY</button>
+          <button class="bt-filter-btn" onclick="btFilter('bear',this)">SELL</button>
+          <button class="bt-filter-btn" onclick="btFilter('tp',this)">TP ✓</button>
+          <button class="bt-filter-btn" onclick="btFilter('sl',this)">SL ✗</button>
+          <button class="bt-filter-btn" onclick="btFilter('premium',this)">★ PREMIUM</button>
+        </div>
+        <div id="bt-trade-list"></div>
+
+      </div><!-- /bt-results -->
+    </div>
+  </div><!-- /page-backtest -->
+
 </div><!-- /app -->
 
 <!-- BOTTOM NAV -->
@@ -674,6 +858,10 @@ body::before {
   <button class="nav-btn" id="nav-alerts" onclick="switchPage('alerts')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     ALERTY
+  </button>
+  <button class="nav-btn" id="nav-backtest" onclick="switchPage('backtest')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    BACKTEST
   </button>
   <button class="nav-btn" id="nav-stats" onclick="switchPage('stats')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -1731,6 +1919,426 @@ if (initSession) {
   log('⏸ Appka spuštěna mimo session – čekám na London/NY', 'info');
 }
 startAutoRefresh();
+
+// ============================================================
+// BACKTEST ENGINE
+// ============================================================
+let btRawCandles = [];   // všechny svíčky z CSV
+let btTrades     = [];   // výsledné obchody
+let btFilter_cur = 'all';
+
+// ── CSV Parser (histdata.com formáty) ──────────────────────
+// Formát 1: YYYYMMDD HHMMSS;O;H;L;C;V  (M1 tick)
+// Formát 2: YYYY.MM.DD,HH:MM,O,H,L,C,V (MT4 export)
+// Formát 3: Date,Time,Open,High,Low,Close,Volume
+function parseHistdataCSV(text) {
+  const lines = text.trim().split('\n').filter(l=>l.trim());
+  const candles = [];
+  // Detekuj separator
+  const sep = lines[0].includes(';') ? ';' : ',';
+  // Přeskoč header pokud existuje
+  const startIdx = isNaN(parseFloat(lines[0].split(sep)[2])) ? 1 : 0;
+
+  for(let i=startIdx; i<lines.length; i++){
+    const p = lines[i].trim().split(sep);
+    if(p.length < 5) continue;
+    try {
+      let dt, o, h, l, c;
+      // Formát s datetime v prvním sloupci (YYYYMMDD HHMMSS nebo YYYY.MM.DD HH:MM)
+      if(p[0].length >= 8 && p[1] && (p[1].length === 6 || p[1].includes(':'))){
+        const ds = p[0].replace(/\./g,'');
+        const ts = p[1].replace(/:/g,'').padEnd(6,'0');
+        const yr=+ds.slice(0,4), mo=+ds.slice(4,6)-1, dy=+ds.slice(6,8);
+        const hr=+ts.slice(0,2), mn=+ts.slice(2,4);
+        dt = new Date(Date.UTC(yr,mo,dy,hr,mn));
+        o=+p[2]; h=+p[3]; l=+p[4]; c=+p[5];
+      } else {
+        // Datetime v jednom sloupci
+        dt = new Date(p[0]);
+        o=+p[1]; h=+p[2]; l=+p[3]; c=+p[4];
+      }
+      if(isNaN(dt.getTime())||isNaN(o)||o<=0) continue;
+      candles.push({dt, open:o, high:h, low:l, close:c});
+    } catch(e){}
+  }
+  candles.sort((a,b)=>a.dt-b.dt);
+  return candles;
+}
+
+// ── Resample na vyšší TF ───────────────────────────────────
+function resampleCandles(candles, tfMinutes) {
+  if(!candles.length) return [];
+  const out = [];
+  let bucket = null;
+  const tfMs = tfMinutes * 60000;
+
+  for(const c of candles){
+    const slotTime = new Date(Math.floor(c.dt.getTime()/tfMs)*tfMs);
+    if(!bucket || slotTime.getTime() !== bucket.dt.getTime()){
+      if(bucket) out.push(bucket);
+      bucket = { dt:slotTime, open:c.open, high:c.high, low:c.low, close:c.close };
+    } else {
+      bucket.high  = Math.max(bucket.high, c.high);
+      bucket.low   = Math.min(bucket.low,  c.low);
+      bucket.close = c.close;
+    }
+  }
+  if(bucket) out.push(bucket);
+  return out;
+}
+
+// ── Session filtr ──────────────────────────────────────────
+function inSession(dt, sessionFilter) {
+  if(sessionFilter==='all') return true;
+  const h = dt.getUTCHours(), m = dt.getUTCMinutes();
+  const totMin = h*60+m;
+  // London = 07:00–10:00 UTC, NY = 13:30–16:30 UTC
+  const inLondon = totMin>=420  && totMin<600;
+  const inNY     = totMin>=810  && totMin<990;
+  if(sessionFilter==='london') return inLondon;
+  if(sessionFilter==='ny')     return inNY;
+  if(sessionFilter==='both')   return inLondon||inNY;
+  return true;
+}
+
+// ── Hlavní backtest smyčka ────────────────────────────────
+function runBacktest() {
+  const btn = document.getElementById('bt-run-btn');
+  const prog = document.getElementById('bt-progress');
+  const progFill = document.getElementById('bt-prog-fill');
+  if(!btRawCandles.length){ alert('Nejprve nahraj CSV soubor!'); return; }
+
+  btn.disabled=true;
+  prog.style.display='block';
+  progFill.style.width='0%';
+
+  // Async aby UI nezamrzlo
+  setTimeout(()=>{
+    const tfMin     = parseInt(document.getElementById('bt-tf').value);
+    const rrRatio   = parseFloat(document.getElementById('bt-rr').value);
+    const sessFilter= document.getElementById('bt-session').value;
+    const setupFilter=document.getElementById('bt-setup').value;
+
+    // Resample na zvolený TF
+    const candles5  = resampleCandles(btRawCandles, 5);
+    const candles15 = resampleCandles(btRawCandles, 15);
+    const candles60 = resampleCandles(btRawCandles, 60);
+
+    progFill.style.width='20%';
+
+    btTrades = [];
+    const LOOKBACK_H1  = 30;
+    const LOOKBACK_M15 = 30;
+    const LOOKBACK_M5  = 20;
+    const MIN_CANDLES  = Math.max(LOOKBACK_H1, LOOKBACK_M15, LOOKBACK_M5) + 5;
+
+    // Iteruj přes M15 svíčky jako hlavní časová osa
+    for(let i=MIN_CANDLES; i<candles15.length; i++){
+      const dt = candles15[i].dt;
+      if(!inSession(dt, sessFilter)) continue;
+
+      // Sesbírej context svíčky do aktuálního bodu
+      const h1Idx  = candles60.findIndex(c=>c.dt>=dt);
+      const m5Idx  = candles5.findIndex(c=>c.dt>=dt);
+      if(h1Idx<LOOKBACK_H1||m5Idx<LOOKBACK_M5) continue;
+
+      const h1slice  = candles60.slice(h1Idx-LOOKBACK_H1, h1Idx);
+      const m15slice = candles15.slice(i-LOOKBACK_M15, i);
+      const m5slice  = candles5.slice(m5Idx-LOOKBACK_M5, m5Idx);
+      if(h1slice.length<10||m15slice.length<10||m5slice.length<5) continue;
+
+      // Spusť RIMC logiku
+      const atr    = calcATR(h1slice.map(c=>c.high), h1slice.map(c=>c.low), h1slice.map(c=>c.close));
+      const range  = detectRange(h1slice);
+      const init   = detectLiqGrabBOS(m15slice, atr);
+      if(!init.detected || !init.bosConfirmed) continue;
+
+      const obM5   = detectOrderBlock(m5slice, init.direction, atr);
+      const obM15  = detectOrderBlock(m15slice, init.direction, atr);
+      const activeOB = obM5 || obM15;
+      if(!activeOB) continue;
+
+      const price  = candles15[i].close;
+      const inOB   = price>=activeOB.bottom && price<=activeOB.top;
+      if(!inOB) continue;
+
+      const mss    = detectMSS(m5slice, init.direction, m5slice.length-8);
+      if(!mss.detected) continue;
+
+      const isPremium = activeOB.hasFVG && mss.clean;
+      if(setupFilter==='premium' && !isPremium) continue;
+      if(setupFilter==='standard' && isPremium) continue;
+
+      // Vypočítej SL/TP
+      const dir  = init.direction;
+      let entry, sl, tp;
+      if(dir==='BULL'){
+        entry = price;
+        sl    = activeOB.bottom - atr*0.2;
+        tp    = entry + (entry-sl)*rrRatio;
+      } else {
+        entry = price;
+        sl    = activeOB.top + atr*0.2;
+        tp    = entry - (sl-entry)*rrRatio;
+      }
+      const slPips = Math.abs(entry-sl)*10000;
+      if(slPips<3 || slPips>80) continue; // filtr nereálných SL
+
+      // Simuluj výsledek – hledej hit v následujících svíčkách (max 48h = 192×M15)
+      let result='open', exitDt=null, exitPrice=null;
+      const futureM15 = candles15.slice(i+1, i+1+192);
+      for(const fc of futureM15){
+        if(dir==='BULL'){
+          if(fc.low<=sl){  result='sl'; exitDt=fc.dt; exitPrice=sl; break; }
+          if(fc.high>=tp){ result='tp'; exitDt=fc.dt; exitPrice=tp; break; }
+        } else {
+          if(fc.high>=sl){ result='sl'; exitDt=fc.dt; exitPrice=sl; break; }
+          if(fc.low<=tp){  result='tp'; exitDt=fc.dt; exitPrice=tp; break; }
+        }
+      }
+      if(result==='open') continue; // nevyhodnocený obchod – přeskoč
+
+      const rPnl = result==='tp' ? rrRatio : -1;
+
+      btTrades.push({
+        dt, exitDt, dir, entry, sl, tp, slPips: slPips.toFixed(1),
+        result, rPnl, isPremium,
+        month: dt.toISOString().slice(0,7),
+      });
+
+      // Přeskoč dalších min 4h aby nedošlo k duplicitám ze stejné zóny
+      i += 16;
+    }
+
+    progFill.style.width='80%';
+    renderBacktestResults(rrRatio);
+    progFill.style.width='100%';
+    setTimeout(()=>{ prog.style.display='none'; btn.disabled=false; }, 500);
+  }, 50);
+}
+
+// ── Render výsledků ────────────────────────────────────────
+function renderBacktestResults(rrRatio) {
+  const trades = btTrades;
+  if(!trades.length){
+    document.getElementById('bt-results').style.display='block';
+    document.getElementById('bt-trade-list').innerHTML=
+      '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Žádné obchody nenalezeny. Zkus jiný TF nebo session filtr.</div>';
+    return;
+  }
+
+  const tp    = trades.filter(t=>t.result==='tp').length;
+  const sl    = trades.filter(t=>t.result==='sl').length;
+  const total = tp+sl;
+  const wr    = total>0 ? (tp/total*100).toFixed(1) : 0;
+  const netR  = trades.reduce((a,t)=>a+t.rPnl,0).toFixed(2);
+  const grossW= trades.filter(t=>t.result==='tp').reduce((a,t)=>a+t.rPnl,0);
+  const grossL= Math.abs(trades.filter(t=>t.result==='sl').reduce((a,t)=>a+t.rPnl,0));
+  const pf    = grossL>0 ? (grossW/grossL).toFixed(2) : '∞';
+  const avgRR = total>0 ? (trades.reduce((a,t)=>a+t.rPnl,0)/total).toFixed(2) : 0;
+
+  // Max drawdown
+  let peak=0,eq=0,maxDD=0;
+  trades.forEach(t=>{ eq+=t.rPnl; if(eq>peak)peak=eq; maxDD=Math.max(maxDD,peak-eq); });
+
+  // Max consecutive losses
+  let maxLoss=0,curLoss=0;
+  trades.forEach(t=>{ t.result==='sl'?(curLoss++,maxLoss=Math.max(maxLoss,curLoss)):curLoss=0; });
+
+  // Premium WR
+  const premTrades = trades.filter(t=>t.isPremium);
+  const premTP = premTrades.filter(t=>t.result==='tp').length;
+  const premWR = premTrades.length>0 ? (premTP/premTrades.length*100).toFixed(1)+'%' : '–';
+
+  // Update KPI
+  const setKPI = (id,val,cls) => {
+    document.getElementById(id).textContent=val;
+    document.getElementById(id).parentElement.className='bt-kpi '+cls;
+  };
+  setKPI('bk-wr',    wr+'%',      wr>=50?'pos':'neg');
+  setKPI('bk-pf',    pf,          pf>=1.2?'pos':'neg');
+  setKPI('bk-dd',    maxDD.toFixed(1)+'R', maxDD<5?'neu':'warn');
+  setKPI('bk-rr',    avgRR+'R',   avgRR>=0?'pos':'neg');
+  setKPI('bk-total', total,       'neu');
+  setKPI('bk-net',   netR+'R',    netR>=0?'pos':'neg');
+  setKPI('bk-premium-wr', premWR, premTP/Math.max(premTrades.length,1)>=0.5?'pos':'neg');
+  setKPI('bk-consec', maxLoss,    maxLoss<=3?'neu':'warn');
+
+  // Equity curve
+  drawEquityCurve(trades);
+  drawMonthlyChart(trades);
+
+  document.getElementById('bt-results').style.display='block';
+  renderTradeList('all');
+}
+
+function drawEquityCurve(trades) {
+  const canvas = document.getElementById('bt-equity-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 140 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W=canvas.offsetWidth, H=140;
+
+  // Build equity series
+  let eq=0;
+  const series=[0];
+  trades.forEach(t=>{ eq+=t.rPnl; series.push(eq); });
+
+  const minEq=Math.min(...series), maxEq=Math.max(...series);
+  const range=maxEq-minEq||1;
+  const pad=16;
+
+  const x = i => pad + (i/(series.length-1))*(W-pad*2);
+  const y = v => (H-pad) - ((v-minEq)/range)*(H-pad*2);
+
+  // Grid lines
+  ctx.strokeStyle='rgba(30,45,61,0.8)'; ctx.lineWidth=1;
+  [0,0.25,0.5,0.75,1].forEach(t=>{
+    const yy=pad+(1-t)*(H-pad*2);
+    ctx.beginPath(); ctx.moveTo(pad,yy); ctx.lineTo(W-pad,yy); ctx.stroke();
+  });
+
+  // Zero line
+  if(minEq<0 && maxEq>0){
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad,y(0)); ctx.lineTo(W-pad,y(0)); ctx.stroke();
+  }
+
+  // Fill
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'rgba(0,230,118,0.25)');
+  grad.addColorStop(1,'rgba(0,230,118,0.02)');
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  ctx.moveTo(x(0),H-pad);
+  series.forEach((v,i)=>ctx.lineTo(x(i),y(v)));
+  ctx.lineTo(x(series.length-1),H-pad);
+  ctx.closePath(); ctx.fill();
+
+  // Line
+  ctx.strokeStyle='#00e676'; ctx.lineWidth=2; ctx.lineJoin='round';
+  ctx.beginPath();
+  series.forEach((v,i)=>i===0?ctx.moveTo(x(i),y(v)):ctx.lineTo(x(i),y(v)));
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle='#546e7a'; ctx.font=`${9*window.devicePixelRatio/window.devicePixelRatio}px monospace`;
+  ctx.fillText(maxEq.toFixed(1)+'R', 2, pad+4);
+  ctx.fillText(minEq.toFixed(1)+'R', 2, H-pad+4);
+}
+
+function drawMonthlyChart(trades) {
+  const canvas = document.getElementById('bt-monthly-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 120 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W=canvas.offsetWidth, H=120;
+
+  // Group by month
+  const months={};
+  trades.forEach(t=>{ months[t.month]=(months[t.month]||0)+t.rPnl; });
+  const keys=Object.keys(months).sort();
+  if(!keys.length) return;
+
+  const vals=keys.map(k=>months[k]);
+  const maxAbs=Math.max(...vals.map(Math.abs),0.1);
+  const barW=(W-16)/keys.length;
+  const midY=H/2;
+
+  keys.forEach((k,i)=>{
+    const v=vals[i];
+    const bh=Math.abs(v)/maxAbs*(midY-8);
+    const bx=8+i*barW+barW*0.1;
+    const bw=barW*0.8;
+    ctx.fillStyle=v>=0?'rgba(0,230,118,0.7)':'rgba(255,23,68,0.7)';
+    ctx.beginPath();
+    ctx.roundRect(bx, v>=0?midY-bh:midY, bw, bh, 2);
+    ctx.fill();
+  });
+
+  // Zero line
+  ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(8,midY); ctx.lineTo(W-8,midY); ctx.stroke();
+}
+
+// ── Trade list render ──────────────────────────────────────
+function renderTradeList(filter) {
+  btFilter_cur=filter;
+  let trades=btTrades;
+  if(filter==='bull')    trades=trades.filter(t=>t.dir==='BULL');
+  if(filter==='bear')    trades=trades.filter(t=>t.dir==='BEAR');
+  if(filter==='tp')      trades=trades.filter(t=>t.result==='tp');
+  if(filter==='sl')      trades=trades.filter(t=>t.result==='sl');
+  if(filter==='premium') trades=trades.filter(t=>t.isPremium);
+
+  const el=document.getElementById('bt-trade-list');
+  if(!trades.length){ el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Žádné obchody pro tento filtr.</div>'; return; }
+
+  // Zobraz posledních 100
+  const shown=trades.slice(-100).reverse();
+  el.innerHTML=shown.map(t=>{
+    const dtStr=t.dt.toISOString().slice(0,16).replace('T',' ');
+    const isBull=t.dir==='BULL';
+    const resCls=t.result==='tp'?'tp':t.result==='sl'?'sl':'be';
+    const resLabel=t.result==='tp'?'✓ TP':t.result==='sl'?'✗ SL':'→ BE';
+    return`<div class="bt-trade ${isBull?'bull':'bear'}">
+      <div class="bt-trade-header">
+        <span class="bt-trade-dir ${isBull?'bull':'bear'}">${isBull?'▲ BUY':'▼ SELL'}${t.isPremium?' ★':''}</span>
+        <span class="bt-trade-result ${resCls}">${resLabel} ${t.rPnl>0?'+':''}${t.rPnl}R</span>
+      </div>
+      <div class="bt-trade-meta">
+        <span>${dtStr}</span>
+        <span>SL: ${t.slPips}p</span>
+        <span>Entry: ${t.entry.toFixed(5)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function btFilter(f, el) {
+  document.querySelectorAll('.bt-filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderTradeList(f);
+}
+
+// ── File loader ────────────────────────────────────────────
+function btLoadFile(input) {
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result;
+    btRawCandles=parseHistdataCSV(text);
+    const info=document.getElementById('bt-file-info');
+    if(btRawCandles.length>0){
+      const from=btRawCandles[0].dt.toISOString().slice(0,10);
+      const to=btRawCandles[btRawCandles.length-1].dt.toISOString().slice(0,10);
+      info.style.display='block';
+      info.textContent=`✓ Načteno ${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
+      document.getElementById('bt-run-btn').disabled=false;
+      document.getElementById('bt-drop').querySelector('.bt-upload-label').innerHTML=
+        `<strong style="color:var(--bull)">✓ ${file.name}</strong><br>${btRawCandles.length.toLocaleString()} svíček načteno`;
+    } else {
+      info.style.display='block';
+      info.style.color='var(--bear)';
+      info.textContent='⚠ Nepodařilo se načíst CSV. Zkontroluj formát.';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Drag & drop
+document.getElementById('bt-drop').addEventListener('dragover',e=>{e.preventDefault();e.currentTarget.classList.add('drag');});
+document.getElementById('bt-drop').addEventListener('dragleave',e=>e.currentTarget.classList.remove('drag'));
+document.getElementById('bt-drop').addEventListener('drop',e=>{
+  e.preventDefault(); e.currentTarget.classList.remove('drag');
+  const f=e.dataTransfer.files[0]; if(!f) return;
+  document.getElementById('bt-file').files=e.dataTransfer.files;
+  btLoadFile(document.getElementById('bt-file'));
+});
+
 </script>
 </body>
 </html>

@@ -435,125 +435,6 @@ body::before {
   padding:5px 10px; border-radius:4px; cursor:pointer;
 }
 
-/* ── BACKTEST PAGE ── */
-.bt-upload-zone {
-  border:2px dashed var(--border); border-radius:8px;
-  padding:28px 16px; text-align:center; margin-bottom:12px;
-  transition:border-color .2s; cursor:pointer;
-}
-.bt-upload-zone.drag { border-color:var(--accent); background:rgba(0,229,255,.05); }
-.bt-upload-zone input { display:none; }
-.bt-upload-icon { font-size:32px; margin-bottom:8px; }
-.bt-upload-label { font-family:var(--mono); font-size:11px; color:var(--text-dim); line-height:1.7; }
-.bt-upload-label strong { color:var(--accent); }
-
-.bt-controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-.bt-ctrl { display:flex; flex-direction:column; gap:4px; }
-.bt-ctrl label { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; }
-.bt-ctrl select, .bt-ctrl input {
-  background:var(--bg3); border:1px solid var(--border);
-  color:var(--text); font-family:var(--mono); font-size:11px;
-  padding:7px 10px; border-radius:5px; outline:none; -webkit-appearance:none;
-}
-
-.bt-run-btn {
-  width:100%; background:var(--accent); color:#000;
-  border:none; font-family:var(--mono); font-size:12px; font-weight:700;
-  padding:13px; border-radius:6px; cursor:pointer; letter-spacing:1px;
-  margin-bottom:16px; transition:opacity .2s;
-}
-.bt-run-btn:disabled { opacity:.4; cursor:not-allowed; }
-
-.bt-progress {
-  background:var(--bg3); border-radius:6px; overflow:hidden;
-  height:4px; margin-bottom:12px; display:none;
-}
-.bt-progress-fill { height:100%; background:var(--accent); transition:width .1s; width:0%; }
-
-/* KPI GRID */
-.bt-kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-.bt-kpi {
-  background:var(--bg3); border-radius:8px; padding:12px;
-  display:flex; flex-direction:column; gap:4px;
-}
-.bt-kpi-val { font-family:var(--mono); font-size:22px; font-weight:700; }
-.bt-kpi-lbl { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; }
-.bt-kpi.pos .bt-kpi-val { color:var(--bull); }
-.bt-kpi.neg .bt-kpi-val { color:var(--bear); }
-.bt-kpi.neu .bt-kpi-val { color:var(--accent); }
-.bt-kpi.warn .bt-kpi-val { color:var(--accent2); }
-
-/* EQUITY CURVE */
-.bt-chart-wrap {
-  background:var(--bg3); border-radius:8px; padding:12px;
-  margin-bottom:12px; position:relative;
-}
-.bt-chart-title { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
-#bt-equity-canvas { width:100%; height:140px; display:block; }
-
-/* TRADE LIST */
-.bt-trade-filters { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
-.bt-filter-btn {
-  font-family:var(--mono); font-size:9px; padding:4px 10px;
-  border-radius:3px; border:1px solid var(--border);
-  background:var(--bg3); color:var(--text-dim); cursor:pointer;
-  letter-spacing:1px;
-}
-.bt-filter-btn.active { border-color:var(--accent); color:var(--accent); background:rgba(0,229,255,.08); }
-
-.bt-trade {
-  background:var(--bg3); border-radius:6px; padding:10px 12px;
-  margin-bottom:5px; border-left:3px solid transparent;
-  font-family:var(--mono); font-size:10px;
-}
-.bt-trade.bull { border-color:var(--bull); }
-.bt-trade.bear { border-color:var(--bear); }
-.bt-trade-header { display:flex; justify-content:space-between; margin-bottom:5px; }
-.bt-trade-dir { font-weight:700; }
-.bt-trade-dir.bull { color:var(--bull); }
-.bt-trade-dir.bear { color:var(--bear); }
-.bt-trade-result { font-weight:700; }
-.bt-trade-result.tp { color:var(--bull); }
-.bt-trade-result.sl { color:var(--bear); }
-.bt-trade-result.be { color:var(--accent); }
-.bt-trade-meta { color:var(--text-dim); display:flex; gap:10px; flex-wrap:wrap; }
-
-
-/* BACKTEST COMPARE */
-.bt-saved-header {
-  display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:10px;
-}
-.bt-save-btn {
-  background:rgba(0,229,255,.1); border:1px solid rgba(0,229,255,.3);
-  color:var(--accent); font-family:var(--mono); font-size:10px;
-  padding:6px 12px; border-radius:4px; cursor:pointer;
-}
-.bt-save-btn:disabled { opacity:.3; cursor:not-allowed; }
-.bt-compare-wrap { overflow-x:auto; margin-bottom:12px; }
-.bt-compare-table {
-  width:100%; border-collapse:collapse;
-  font-family:var(--mono); font-size:10px; min-width:520px;
-}
-.bt-compare-table th {
-  background:var(--bg3); color:var(--text-dim);
-  padding:7px 10px; text-align:left;
-  border-bottom:1px solid var(--border);
-  letter-spacing:1px; font-weight:400;
-  white-space:nowrap;
-}
-.bt-compare-table td {
-  padding:7px 10px; border-bottom:1px solid rgba(30,45,61,.5);
-  white-space:nowrap;
-}
-.bt-compare-table tr:hover td { background:rgba(255,255,255,.02); }
-.bt-compare-table .best { color:var(--bull); font-weight:700; }
-.bt-compare-table .worst { color:var(--bear); }
-.bt-del-btn {
-  background:none; border:none; color:var(--text-dim);
-  cursor:pointer; font-size:12px; padding:2px 6px;
-}
-.bt-del-btn:hover { color:var(--bear); }
 .bt-name-input {
   background:var(--bg3); border:1px solid var(--border);
   color:var(--text); font-family:var(--mono); font-size:11px;
@@ -744,6 +625,9 @@ body::before {
       <div class="config-note">
         Pro live data se zaregistruj zdarma na <strong style="color:var(--accent)">twelvedata.com</strong> a vlož API klíč. Bez klíče běží DEMO mód.
       </div>
+      <div class="config-note" style="border-color:rgba(0,229,255,.3);color:var(--accent)">
+        ★ Backtest v6: IS 2024 PF=1.51 N=290 | OOS 2023 PF=1.62 N=254 | BE@0.8R | RR 1.5:1
+      </div>
       <div class="config-row">
         <label>API Klíč (Twelve Data)</label>
         <input type="text" id="cfg-apikey" placeholder="Vlož svůj API klíč..." autocomplete="off" spellcheck="false">
@@ -766,6 +650,18 @@ body::before {
       <div class="config-row">
         <label>Risk na obchod (%)</label>
         <input type="number" id="cfg-risk" placeholder="0.25" min="0.1" max="5" step="0.05">
+      </div>
+      <div style="height:1px;background:var(--border);margin:16px 0"></div>
+      <div class="section-title" style="margin-bottom:12px">Discord notifikace</div>
+      <div class="config-note" style="border-color:rgba(88,101,242,.3);color:#7289da">
+        🎮 Kanál → Nastavení → Integrace → Webhooks → Nový webhook → zkopíruj URL. Notifikace přijdou i při zamčeném PC.
+      </div>
+      <div class="config-row">
+        <label>Discord Webhook URL</label>
+        <input type="text" id="cfg-discord" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="config-row">
+        <button class="save-btn" style="background:#5865F2;margin-top:0" onclick="testDiscord()">🧪 OTESTOVAT DISCORD</button>
       </div>
       <div style="height:1px;background:var(--border);margin:16px 0"></div>
       <div class="section-title" style="margin-bottom:12px">Alert limity</div>
@@ -791,170 +687,7 @@ body::before {
     </div>
   </div>
 
-  <!-- PAGE: BACKTEST -->
-  <div class="page" id="page-backtest">
-    <div class="section">
-      <div class="section-title">Backtest – RIMC GBPUSD</div>
 
-      <!-- UPLOAD -->
-      <!-- NAČÍST Z GITHUBU -->
-      <div style="margin-bottom:10px">
-        <button class="bt-run-btn" style="background:var(--bg3);color:var(--accent);border:1px solid rgba(0,229,255,.3);margin-bottom:6px" onclick="loadFromGitHub()">
-          ⬇ NAČÍST DATA Z GITHUBU (2023+2024+2025)
-        </button>
-        <div id="bt-github-progress" style="display:none">
-          <div class="bt-progress" style="display:block"><div class="bt-progress-fill" id="bt-gh-fill"></div></div>
-          <div id="bt-github-status" style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-top:4px"></div>
-        </div>
-      </div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:8px">── nebo nahraj manuálně ──</div>
-
-      <div class="bt-upload-zone" id="bt-drop" onclick="document.getElementById('bt-file').click()">
-        <input type="file" id="bt-file" accept=".csv,.txt" multiple onchange="btLoadFiles(this)">
-        <div class="bt-upload-icon">📂</div>
-        <div class="bt-upload-label">
-          <strong>Nahraj CSV z histdata.com</strong><br>
-          Vyber více souborů najednou (2023+2024+2025)<br>
-          Formát: DAT_GBPUSD_M1_*.csv
-        </div>
-      </div>
-      <div id="bt-file-info" style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:8px;display:none"></div>
-
-      <!-- CONTROLS -->
-      <div class="bt-controls">
-        <div class="bt-ctrl">
-          <label>Timeframe svíček</label>
-          <select id="bt-tf">
-            <option value="5">M5</option>
-            <option value="15" selected>M15</option>
-            <option value="60">H1</option>
-          </select>
-        </div>
-        <div class="bt-ctrl">
-          <label>RR ratio</label>
-          <select id="bt-rr">
-            <option value="1.5">1:1.5</option>
-            <option value="2" selected>1:2</option>
-            <option value="2.5">1:2.5</option>
-            <option value="3">1:3</option>
-          </select>
-        </div>
-        <div class="bt-ctrl">
-          <label>Session filtr</label>
-          <select id="bt-session">
-            <option value="all">Vše</option>
-            <option value="london" selected>London (8–11)</option>
-            <option value="ny">New York (14:30–17:30)</option>
-            <option value="both">London + NY</option>
-          </select>
-        </div>
-        <div class="bt-ctrl">
-          <label>Typ setupu</label>
-          <select id="bt-setup">
-            <option value="all">Vše</option>
-            <option value="premium">★ Premium only</option>
-            <option value="standard">Standard only</option>
-          </select>
-        </div>
-        <div class="bt-ctrl">
-          <label>Spread simulace (pipy)</label>
-          <select id="bt-spread">
-            <option value="0">0p (ideální)</option>
-            <option value="1">1p (ECN)</option>
-            <option value="2" selected>2p (standard)</option>
-            <option value="3">3p (retail)</option>
-            <option value="5">5p (konzervativní)</option>
-          </select>
-        </div>
-        <div class="bt-ctrl">
-          <label>Slippage (pipy)</label>
-          <select id="bt-slippage">
-            <option value="0">0p (ideální)</option>
-            <option value="0.5" selected>0.5p (standard)</option>
-            <option value="1">1p (konzervativní)</option>
-            <option value="2">2p (pesimistický)</option>
-          </select>
-        </div>
-        <div class="bt-ctrl">
-          <label>Komisní náklady</label>
-          <select id="bt-commission">
-            <option value="0">$0 (market maker)</option>
-            <option value="3.5" selected>$3.5/lot (ECN)</option>
-            <option value="7">$7/lot (vyšší)</option>
-          </select>
-        </div>
-        <div class="bt-ctrl">
-          <label>Min SL velikost (pipy)</label>
-          <select id="bt-minsl">
-            <option value="5">5p</option>
-            <option value="10" selected>10p</option>
-            <option value="15">15p</option>
-            <option value="20">20p</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="bt-realism-info" style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);border-radius:6px;padding:10px 12px;margin-bottom:10px;font-family:var(--mono);font-size:10px;color:var(--text-dim);line-height:1.7;display:none">
-        <span style="color:var(--accent)">⚙ Realism faktor:</span> <span id="bt-realism-summary">–</span>
-      </div>
-      <button class="bt-run-btn" id="bt-run-btn" onclick="runBacktest()" disabled>▶ SPUSTIT BACKTEST</button>
-      <div class="bt-progress" id="bt-progress"><div class="bt-progress-fill" id="bt-prog-fill"></div></div>
-
-      <!-- RESULTS (skryté dokud není backtest) -->
-      <div id="bt-results" style="display:none">
-
-        <!-- KPI -->
-        <div class="bt-kpi-grid">
-          <div class="bt-kpi pos"><div class="bt-kpi-val" id="bk-wr">–</div><div class="bt-kpi-lbl">Win Rate</div></div>
-          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-pf">–</div><div class="bt-kpi-lbl">Profit Factor</div></div>
-          <div class="bt-kpi warn"><div class="bt-kpi-val" id="bk-dd">–</div><div class="bt-kpi-lbl">Max Drawdown</div></div>
-          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-rr">–</div><div class="bt-kpi-lbl">Avg R:R</div></div>
-          <div class="bt-kpi pos"><div class="bt-kpi-val" id="bk-total">–</div><div class="bt-kpi-lbl">Celkem obchodů</div></div>
-          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-net">–</div><div class="bt-kpi-lbl">Net P&L (R)</div></div>
-          <div class="bt-kpi neu"><div class="bt-kpi-val" id="bk-premium-wr">–</div><div class="bt-kpi-lbl">★ Premium WR</div></div>
-          <div class="bt-kpi warn"><div class="bt-kpi-val" id="bk-consec">–</div><div class="bt-kpi-lbl">Max ztráty v řadě</div></div>
-        </div>
-
-        <!-- EQUITY CURVE -->
-        <div class="bt-chart-wrap">
-          <div class="bt-chart-title">Equity Curve (R)</div>
-          <canvas id="bt-equity-canvas"></canvas>
-        </div>
-
-        <!-- MONTHLY BREAKDOWN -->
-        <div class="bt-chart-wrap">
-          <div class="bt-chart-title">Měsíční výsledky (R)</div>
-          <canvas id="bt-monthly-canvas" style="width:100%;height:120px;display:block"></canvas>
-        </div>
-
-        <!-- TRADE LIST -->
-        <div class="section-title" style="margin-bottom:8px">Seznam obchodů</div>
-        <div class="bt-trade-filters">
-          <button class="bt-filter-btn active" onclick="btFilter('all',this)">VŠE</button>
-          <button class="bt-filter-btn" onclick="btFilter('bull',this)">BUY</button>
-          <button class="bt-filter-btn" onclick="btFilter('bear',this)">SELL</button>
-          <button class="bt-filter-btn" onclick="btFilter('tp',this)">TP ✓</button>
-          <button class="bt-filter-btn" onclick="btFilter('sl',this)">SL ✗</button>
-          <button class="bt-filter-btn" onclick="btFilter('premium',this)">★ PREMIUM</button>
-        </div>
-        <div id="bt-trade-list"></div>
-
-      </div><!-- /bt-results -->
-
-      <!-- SAVE + COMPARE -->
-      <div style="margin-top:16px">
-        <div class="bt-saved-header">
-          <div class="section-title" style="margin:0">Uložené backtesty</div>
-          <button class="bt-save-btn" id="bt-save-btn" onclick="saveBacktest()" disabled>💾 ULOŽIT</button>
-        </div>
-        <input class="bt-name-input" id="bt-run-name" placeholder="Název např. Premium London 2023–2025" maxlength="40">
-        <div id="bt-compare-wrap">
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Zatím žádné uložené backtesty.</div>
-        </div>
-      </div>
-
-    </div>
-  </div><!-- /page-backtest -->
 
 </div><!-- /app -->
 
@@ -972,11 +705,11 @@ body::before {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     ALERTY
   </button>
-  <button class="nav-btn" id="nav-backtest" onclick="switchPage('backtest')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    BACKTEST
+  <button class="nav-btn" id="nav-log" onclick="switchPage('log')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    LOG
   </button>
-  <button class="nav-btn" id="nav-stats" onclick="switchPage('stats')">
+<button class="nav-btn" id="nav-stats" onclick="switchPage('stats')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     STATS
   </button>
@@ -1001,6 +734,7 @@ let CONFIG = {
   riskPct:       parseFloat(LS('risk') || '0.25'),
   zoneAlerts:    parseInt(LS('zone_alerts') || '2'),
   sessionAlerts: parseInt(LS('session_alerts') || '3'),
+  discordWebhook: LS('discord') || '',
 };
 let refreshTimer = null;
 
@@ -1025,12 +759,14 @@ function saveConfig() {
   CONFIG.riskPct       = parseFloat(document.getElementById('cfg-risk').value) || 0.25;
   CONFIG.zoneAlerts    = parseInt(document.getElementById('cfg-zone-alerts').value);
   CONFIG.sessionAlerts = parseInt(document.getElementById('cfg-session-alerts').value);
+  CONFIG.discordWebhook = document.getElementById('cfg-discord').value.trim();
   LSset('apikey', CONFIG.apiKey);
   LSset('interval', CONFIG.interval);
   LSset('balance', CONFIG.balance);
   LSset('risk', CONFIG.riskPct);
   LSset('zone_alerts', CONFIG.zoneAlerts);
   LSset('session_alerts', CONFIG.sessionAlerts);
+  LSset('discord', CONFIG.discordWebhook);
   startAutoRefresh();
   fetchAndAnalyze();
   switchPage('dash');
@@ -1043,6 +779,7 @@ function loadConfigUI() {
   document.getElementById('cfg-risk').value      = CONFIG.riskPct;
   document.getElementById('cfg-zone-alerts').value    = CONFIG.zoneAlerts;
   document.getElementById('cfg-session-alerts').value = CONFIG.sessionAlerts;
+  document.getElementById('cfg-discord').value   = CONFIG.discordWebhook;
 }
 
 // ============================================================
@@ -1090,7 +827,7 @@ function canFireAlert(entry, sl, direction) {
 
 function fireAlert(direction, entry, tp, sl, strength, isPremium) {
   const check = canFireAlert(entry, sl, direction);
-  if(!check.ok) { log(`🚫 Alert blokován: ${check.reason}`, 'info'); return; }
+  if(!check.ok) { log(`🚫 Alert blokován: ${check.reason}`, 'info'); return null; }
 
   const lot    = calcLotSize(entry, sl);
   const slPips = Math.abs(entry - sl) * 10000;
@@ -1104,6 +841,13 @@ function fireAlert(direction, entry, tp, sl, strength, isPremium) {
     isPremium, slPips: slPips.toFixed(1), tpPips: tpPips.toFixed(1),
     riskAmt, session: sessName, time: new Date().toISOString(),
     result: null, zoneKey: check.zoneKey, sessKey: check.sessKey,
+    // ── Live tracking fields ──
+    maxR: 0,
+    currentR: 0,
+    exitR: null,
+    partialPct: null,
+    duration: null,
+    autoResolved: false,
   };
 
   // Ulož
@@ -1121,6 +865,8 @@ function fireAlert(direction, entry, tp, sl, strength, isPremium) {
   updateSessionCounter();
 
   log(`🔔 ALERT ${isPremium?'★ PREMIUM':'STANDARD'} ${direction} | Lot: ${lot} | SL: ${slPips.toFixed(0)}p | Risk: $${riskAmt}`, direction==='BULL'?'bull':'bear');
+
+  return id;  // ★ Vrátí alertId pro propojení s trade managerem
 }
 
 function setAlertResult(id, result) {
@@ -1147,37 +893,69 @@ function renderAlerts() {
   }
   el.innerHTML = todayAlerts.map(a => {
     const isBull = a.direction==='BULL';
-    const expired = a.result !== null;
+    const resolved = a.result !== null;
     const fmt5 = n => (+n).toFixed(5);
-    const resultBtns = ['tp','sl','be','skip'].map(r => {
-      const labels = {tp:'✓ TP HIT', sl:'✗ SL HIT', be:'→ BE', skip:'⊘ SKIP'};
-      const active = a.result===r;
-      return `<button class="result-btn ${active?'active-'+r:''}" onclick="setAlertResult(${a.id},'${r}')">${labels[r]}</button>`;
-    }).join('');
     const timeStr = new Date(a.time).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="alert-card ${isBull?'bull':'bear'} ${expired?'expired':''}">
+
+    // ★ Duration formát
+    let durStr = '';
+    if(a.duration != null) {
+      const h = Math.floor(a.duration / 60);
+      const m = a.duration % 60;
+      durStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    // ★ Live R zobrazení (pro aktivní alerty)
+    const liveR = (!resolved && a.currentR != null)
+      ? `<span style="color:${a.currentR>=0?'var(--bull)':'var(--bear)'}">${a.currentR>=0?'+':''}${a.currentR.toFixed(2)}R</span>`
+      : '';
+
+    // Výsledek badge
+    const resultBadge = resolved
+      ? `<span style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:3px;letter-spacing:1px;${
+          a.result==='tp'?'background:rgba(0,230,118,.15);color:var(--bull)':
+          a.result==='sl'?'background:rgba(255,23,68,.15);color:var(--bear)':
+          a.result==='be'?'background:rgba(0,229,255,.15);color:var(--accent)':
+          'background:rgba(84,110,122,.15);color:var(--neutral)'
+        }">${
+          a.result==='tp'?'✓ TP HIT':a.result==='sl'?'✗ SL HIT':a.result==='be'?'→ BE':'⊘ SKIP'
+        }${a.autoResolved?' ⚡AUTO':''}</span>`
+      : '';
+
+    // Manuální tlačítka (jen pokud nevyhodnoceno)
+    const resultBtns = resolved ? '' : ['tp','sl','be','skip'].map(r => {
+      const labels = {tp:'✓ TP', sl:'✗ SL', be:'→ BE', skip:'⊘ SKIP'};
+      return `<button class="result-btn" onclick="setAlertResult(${a.id},'${r}')">${labels[r]}</button>`;
+    }).join('');
+
+    return `<div class="alert-card ${isBull?'bull':'bear'} ${resolved?'expired':''}">
       <div class="alert-header">
         <div>
           <span class="alert-dir ${isBull?'bull':'bear'}">${isBull?'▲ BUY':'▼ SELL'}</span>
           ${a.isPremium?' <span style="color:var(--accent2);font-family:var(--mono);font-size:10px">★ PREMIUM</span>':''}
+          ${resultBadge}
         </div>
-        <span class="alert-time">${a.session} · ${timeStr}</span>
+        <div style="text-align:right">
+          <span class="alert-time">${a.session} · ${timeStr}</span>
+          ${durStr?`<div style="font-family:var(--mono);font-size:9px;color:var(--text-dim)">⏱ ${durStr}</div>`:''}
+        </div>
       </div>
       <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:10px">
         ${a.lot} lot <span style="font-size:12px;color:var(--text-dim)">/ Risk $${a.riskAmt}</span>
+        ${liveR?` <span style="font-size:14px;margin-left:8px">${liveR}</span>`:''}
       </div>
       <div class="alert-levels" style="grid-template-columns:1fr 1fr 1fr 1fr">
         <div class="alert-lev"><label>ENTRY</label><value style="color:var(--accent)">${fmt5(a.entry)}</value></div>
         <div class="alert-lev"><label>TP (+${a.tpPips}p)</label><value style="color:var(--bull)">${fmt5(a.tp)}</value></div>
         <div class="alert-lev"><label>SL (${a.slPips}p)</label><value style="color:var(--bear)">${fmt5(a.sl)}</value></div>
-        <div class="alert-lev"><label>MAX R ↑</label><value style="color:var(--accent2)">${a.maxR!=null?a.maxR.toFixed(2)+'R':'–'}</value></div>
+        <div class="alert-lev"><label>MAX R ↑</label><value style="color:var(--accent2)">${a.maxR!=null&&a.maxR>0?(+a.maxR).toFixed(2)+'R':'–'}</value></div>
       </div>
-      ${a.maxR!=null?`<div style="display:grid;grid-template-columns:1fr 1fr ${a.partialPct?'1fr':''};gap:8px;margin:8px 0;padding:8px;background:var(--bg);border-radius:6px;font-family:var(--mono)">
+      ${(a.maxR!=null && a.maxR > 0)?`<div style="display:grid;grid-template-columns:1fr 1fr ${a.partialPct?'1fr':''};gap:8px;margin:8px 0;padding:8px;background:var(--bg);border-radius:6px;font-family:var(--mono)">
         <div><div style="font-size:9px;color:var(--text-dim)">MAX R ↑</div><div style="font-size:15px;font-weight:700;color:var(--bull)">${(+a.maxR).toFixed(2)}R</div></div>
-        <div><div style="font-size:9px;color:var(--text-dim)">EXIT R</div><div style="font-size:15px;font-weight:700;color:var(--text)">${a.exitR!=null?(+a.exitR).toFixed(2)+'R':'–'}</div></div>
+        <div><div style="font-size:9px;color:var(--text-dim)">EXIT R</div><div style="font-size:15px;font-weight:700;color:${a.exitR!=null?(a.exitR>=0?'var(--bull)':'var(--bear)'):'var(--text)'}">${a.exitR!=null?(+a.exitR).toFixed(2)+'R':'–'}</div></div>
         ${a.partialPct?`<div><div style="font-size:9px;color:var(--text-dim)">PARTIAL</div><div style="font-size:15px;font-weight:700;color:var(--accent2)">${a.partialPct}%</div></div>`:''}
       </div>`:''}
-      <div class="alert-result-row">${resultBtns}</div>
+      ${resultBtns?`<div class="alert-result-row">${resultBtns}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -1188,28 +966,46 @@ function renderStats() {
   const sl  = all.filter(a=>a.result==='sl').length;
   const be  = all.filter(a=>a.result==='be').length;
   const total = tp+sl+be;
-  const wr  = total>0 ? Math.round((tp/total)*100) : null;
+  const wr  = total>0 ? Math.round(((tp+be)/total)*100) : null;
 
   document.getElementById('stat-wr').textContent = wr!==null ? wr+'%' : '–';
   document.getElementById('stat-wr').style.color = wr>=50?'var(--bull)':'var(--bear)';
 
-  // Avg R:R (TP=2R, SL=-1R, BE=0R)
-  const rSum = tp*2 + sl*(-1) + be*0;
+  // ★ Použij reálné exitR z trade manageru (pokud je k dispozici)
+  let rSum = 0;
+  all.forEach(a => {
+    if(a.exitR != null) {
+      rSum += a.exitR;
+    } else {
+      // Fallback na odhad: TP=R:R, SL=-1R, BE=0R
+      if(a.result==='tp') rSum += P.rrRatio;
+      else if(a.result==='sl') rSum += -1;
+      // be = 0
+    }
+  });
   const rAvg = total>0 ? (rSum/total).toFixed(2) : null;
   document.getElementById('stat-rr').textContent = rAvg!==null ? rAvg+'R' : '–';
   document.getElementById('stat-rr').style.color = rAvg>=0?'var(--bull)':'var(--bear)';
 
+  // ★ Avg maxR
+  const withMaxR = all.filter(a => a.maxR != null && a.maxR > 0);
+  const avgMaxR = withMaxR.length > 0
+    ? (withMaxR.reduce((s,a) => s + a.maxR, 0) / withMaxR.length).toFixed(2)
+    : null;
+
   const premAll  = alertHistory.filter(a=>a.isPremium&&a.result&&a.result!=='skip');
   const premTP   = premAll.filter(a=>a.result==='tp').length;
-  const premWR   = premAll.length>0 ? Math.round(premTP/premAll.length*100) : null;
+  const premWR   = premAll.length>0 ? Math.round((premTP+premAll.filter(a=>a.result==='be').length)/premAll.length*100) : null;
 
   const rows = [
     {l:'Celkem alertů dnes', v: alertHistory.filter(a=>new Date(a.time).toDateString()===new Date().toDateString()).length, cls:'neu'},
     {l:'Vyhodnocených', v:`${total} (TP:${tp} SL:${sl} BE:${be})`, cls:'neu'},
     {l:'★ Premium WR', v:premWR!==null?premWR+'%':'–', cls:premWR>=50?'pos':'neg'},
-    {l:'Celkové P&L (R)', v:rAvg!==null?rAvg+'R':'–', cls:rSum>=0?'pos':'neg'},
+    {l:'Celkové P&L (R)', v:rSum.toFixed(2)+'R', cls:rSum>=0?'pos':'neg'},
+    {l:'Avg Max R ↑', v:avgMaxR!==null?avgMaxR+'R':'–', cls:'pos'},
     {l:'Největší série ztrát', v: calcMaxLossSeries(), cls:'neg'},
-    {l:'Alertů celkem (historie)', v: alertHistory.length, cls:'neu'},
+    {l:'Auto-vyhodnocených', v: alertHistory.filter(a=>a.autoResolved).length, cls:'neu'},
+    {l:'Alertů celkem', v: alertHistory.length, cls:'neu'},
   ];
 
   document.getElementById('stats-rows').innerHTML = rows.map(r=>
@@ -1253,12 +1049,123 @@ async function requestNotifPermission() {
 }
 
 function sendPushNotification(alert) {
-  if(!('Notification' in window) || Notification.permission!=='granted') return;
-  const dir = alert.direction==='BULL' ? '▲ BUY' : '▼ SELL';
-  const title = `RIMC ${alert.isPremium?'★ ':''} ${dir} GBPUSD`;
-  const body  = `Lot: ${alert.lot} | Entry: ${(+alert.entry).toFixed(5)}\nTP: ${(+alert.tp).toFixed(5)} | SL: ${(+alert.sl).toFixed(5)}\nRisk: $${alert.riskAmt}`;
-  try { new Notification(title, { body, icon:'./icon-192.png', badge:'./icon-192.png', tag:'rimc-alert', renotify:true }); }
-  catch(e) { console.log('Notification error:', e); }
+  // Browser push
+  if('Notification' in window && Notification.permission==='granted') {
+    const dir = alert.direction==='BULL' ? '▲ BUY' : '▼ SELL';
+    const title = `RIMC ${alert.isPremium?'★ ':''} ${dir} GBPUSD`;
+    const body  = `Lot: ${alert.lot} | Entry: ${(+alert.entry).toFixed(5)}\nTP: ${(+alert.tp).toFixed(5)} | SL: ${(+alert.sl).toFixed(5)}\nRisk: $${alert.riskAmt}`;
+    try { new Notification(title, { body, icon:'./icon-192.png', badge:'./icon-192.png', tag:'rimc-alert', renotify:true }); }
+    catch(e) { console.log('Notification error:', e); }
+  }
+
+  // ★ Discord
+  const isBull = alert.direction === 'BULL';
+  sendDiscord({
+    title: `${isBull?'🟢 BUY':'🔴 SELL'} GBPUSD ${alert.isPremium?'★ PREMIUM':''}`,
+    color: isBull ? 0x00e676 : 0xff1744,
+    fields: [
+      { name: 'Entry',  value: `\`${(+alert.entry).toFixed(5)}\``, inline: true },
+      { name: 'TP',     value: `\`${(+alert.tp).toFixed(5)}\` (+${alert.tpPips}p)`, inline: true },
+      { name: 'SL',     value: `\`${(+alert.sl).toFixed(5)}\` (${alert.slPips}p)`, inline: true },
+      { name: 'Lot',    value: `**${alert.lot}**`, inline: true },
+      { name: 'Risk',   value: `$${alert.riskAmt}`, inline: true },
+      { name: 'Session',value: alert.session, inline: true },
+    ],
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// DISCORD WEBHOOK
+// ══════════════════════════════════════════════════════════════
+
+function sendDiscord(embed) {
+  if(!CONFIG.discordWebhook) return;
+
+  const payload = {
+    username: 'RIMC · GBPUSD',
+    embeds: [{
+      title: embed.title || 'RIMC Alert',
+      color: embed.color || 0x00e5ff,
+      fields: embed.fields || [],
+      footer: { text: `RIMC v6 · ${new Date().toLocaleTimeString('cs-CZ')}` },
+      timestamp: new Date().toISOString(),
+    }],
+  };
+
+  fetch(CONFIG.discordWebhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(e => {
+    console.log('Discord webhook error:', e);
+    log('⚠ Discord chyba: ' + e.message, 'bear');
+  });
+}
+
+function sendDiscordTradeUpdate(type, trade, msg) {
+  if(!CONFIG.discordWebhook) return;
+
+  const isBull = trade.direction === 'BULL';
+  const colors = {
+    BE:      0x00e5ff,  // cyan
+    PARTIAL: 0xff6b35,  // orange
+    TRAIL:   0x00e676,  // green
+    SL_HIT:  0xff1744,  // red
+    TP_HIT:  0x00e676,  // green
+  };
+  const icons = {
+    BE:      '🔒', PARTIAL: '✂️',
+    TRAIL:   '📈', SL_HIT: '❌', TP_HIT: '✅',
+  };
+
+  const fields = [
+    { name: 'Událost', value: msg, inline: false },
+    { name: 'Entry',   value: `\`${trade.entry.toFixed(5)}\``, inline: true },
+    { name: 'SL',      value: `\`${trade.sl.toFixed(5)}\`${trade.beActivated?' (BE)':''}`, inline: true },
+    { name: 'Max R ↑', value: `**${(trade.maxR||0).toFixed(2)}R**`, inline: true },
+  ];
+
+  // Při uzavření přidej exitR a dobu trvání
+  if(type === 'SL_HIT' || type === 'TP_HIT') {
+    fields.push({ name: 'Exit R', value: `**${(trade.currentR||0).toFixed(2)}R**`, inline: true });
+    if(trade.openTime) {
+      const dur = Math.round((Date.now() - new Date(trade.openTime).getTime()) / 60000);
+      const h = Math.floor(dur / 60);
+      const m = dur % 60;
+      fields.push({ name: 'Doba', value: h > 0 ? `${h}h ${m}m` : `${m}m`, inline: true });
+    }
+    if(trade.partialClosePct) {
+      fields.push({ name: 'Partial', value: `${trade.partialClosePct}%`, inline: true });
+    }
+  }
+
+  sendDiscord({
+    title: `${icons[type]||'📊'} ${type} · ${isBull?'LONG':'SHORT'} GBPUSD`,
+    color: colors[type] || 0x00e5ff,
+    fields,
+  });
+}
+
+function testDiscord() {
+  const url = document.getElementById('cfg-discord').value.trim();
+  if(!url) { alert('Vlož Discord Webhook URL'); return; }
+
+  // Dočasně nastav pro test
+  const old = CONFIG.discordWebhook;
+  CONFIG.discordWebhook = url;
+
+  sendDiscord({
+    title: '🧪 RIMC Test – Discord funguje!',
+    color: 0x5865F2,
+    fields: [
+      { name: 'Status', value: '✓ Webhook aktivní', inline: true },
+      { name: 'Účet',   value: `$${CONFIG.balance}`, inline: true },
+      { name: 'Risk',   value: `${CONFIG.riskPct}%`, inline: true },
+    ],
+  });
+
+  CONFIG.discordWebhook = old;
+  log('🧪 Discord test odeslán', 'info');
 }
 
 // ============================================================
@@ -1271,6 +1178,7 @@ function switchPage(name) {
   document.getElementById('nav-' + name).classList.add('active');
   if(name==='alerts') { renderAlerts(); updateSessionCounter(); }
   if(name==='stats') renderStats();
+  if(name==='settings') loadConfigUI();
 }
 
 function switchTF(tf, el) {
@@ -1331,6 +1239,41 @@ function setPhase(id, badgeCls, badgeTxt, detail, cardCls='') {
   b.textContent = badgeTxt;
   $('pd-' + id).textContent = detail;
 }
+
+// ============================================================
+// OPTIMALIZOVANÉ PARAMETRY (backtest 2023-2025, PF/DD optimum)
+// ============================================================
+const P = {
+  // ═══════════════════════════════════════════════════════
+  // OPTIMALIZOVANÉ PARAMETRY v6 – backtest 2024 (IS) / 2023 (OOS)
+  // IS  2024: PF=1.51 N=290 obchodů Net=+53.8R DD=9.1R
+  // OOS 2023: PF=1.62 N=254 obchodů Net=+54.8R DD=7.7R
+  // PF divergence: 0.11 → ROBUSTNÍ
+  // ═══════════════════════════════════════════════════════
+  grabMult:    3.0,    // × M15 ATR – grab šíře
+  rrRatio:     1.5,    // R:R cíl pro TP
+  slPips:      5,      // fixní SL buffer v pipech pod/nad OB
+  obMargin:    25,     // pips tolerance vstupu do OB
+  wickRatio:   0.15,   // min wick/body (rejection svíčka)
+  obBodyMult:  0.08,   // min tělo OB (× H1 ATR)
+  emaBiasF:    20,     // EMA fast H1 bias
+  emaBiasS:    50,     // EMA slow H1 bias
+  reqMSS:      false,  // MSS fáze 4 = volitelná (skip)
+  reqFVG:      false,
+  spreadPips:  2.0,
+  beAtR:       0.8,    // ★ BE management: SL → entry po dosažení 0.8R
+  // Nové parametry z optimalizace v6:
+  slBuffer:    5,      // alias pro slPips – SL buffer v pipech
+  minSLpips:   2,      // minimální SL v pipech
+  maxSLpips:   35,     // maximální SL v pipech
+  bodyMult:    0.2,    // min impulse body (× ATR) pro OB detekci
+  grabLB:      16,     // grab lookback (počet svíček zpět)
+  swingLB:     3,      // swing detection lookback
+  obSearch:    30,     // OB search depth
+  mssWindow:   10,     // MSS lookback window
+  // Sessions: xwide = London 06:30-12:00 UTC, NY 12:30-17:30 UTC
+  biasMode:    'ema50only', // 'strict' = EMA20>EMA50+price, 'ema50only' = price vs EMA50
+};
 
 // ============================================================
 // MATH HELPERS
@@ -1617,246 +1560,255 @@ function detectMSS(candles, direction, obEntryTime) {
   }
 }
 
+// ── Grab+BOS v2 – respektuje H1 bias ──────────────────────
+function detectLiqGrabBOS_v2(candles, atr, grabMult, bodyMult, bias) {
+  if(candles.length < 20) return {detected:false};
+  const n = candles.length;
+  const {highs, lows} = findSwings(candles, P.swingLB || 3);
+  if(!highs.length || !lows.length) return {detected:false};
+  const lastSH = highs[highs.length-1];
+  const lastSL = lows[lows.length-1];
+  const prevSH = highs.length>1 ? highs[highs.length-2] : null;
+  const prevSL = lows.length>1  ? lows[lows.length-2]   : null;
+
+  for(let i=Math.max(1, n - (P.grabLB || 16)); i<n; i++){
+    const curr = candles[i];
+    const body = Math.abs(curr.close - curr.open);
+    if(body < atr * bodyMult) continue;
+
+    const lowWick  = Math.min(curr.close, curr.open) - curr.low;
+    const highWick = curr.high - Math.max(curr.close, curr.open);
+
+    // BULL grab
+    if(curr.low  < lastSL.level &&
+       curr.close > lastSL.level &&
+       Math.abs(curr.low - lastSL.level) < atr * grabMult &&
+       curr.close > curr.open &&
+       body > 0 && lowWick / body >= P.wickRatio) {
+      const bosLevel = prevSH ? prevSH.level : lastSH.level;
+      const bosOK = curr.close > bosLevel || (i+1<n && candles[i+1]?.close > bosLevel);
+      if(bosOK) return {detected:true, direction:'BULL', grabLevel:lastSL.level,
+                        bosLevel, bosConfirmed:true, candlesAgo:n-1-i};
+    }
+    // BEAR grab
+    if(curr.high > lastSH.level &&
+       curr.close < lastSH.level &&
+       Math.abs(curr.high - lastSH.level) < atr * grabMult &&
+       curr.close < curr.open &&
+       body > 0 && highWick / body >= P.wickRatio) {
+      const bosLevel = prevSL ? prevSL.level : lastSL.level;
+      const bosOK = curr.close < bosLevel || (i+1<n && candles[i+1]?.close < bosLevel);
+      if(bosOK) return {detected:true, direction:'BEAR', grabLevel:lastSH.level,
+                        bosLevel, bosConfirmed:true, candlesAgo:n-1-i};
+    }
+  }
+  return {detected:false};
+}
+
 // ============================================================
-// MAIN ANALYSIS – 6 pravidel, čistá institucionální logika
+// MAIN ANALYSIS – optimalizované RIMC parametry
 // ============================================================
 function analyze(h1, m15, m5) {
   const h1c=h1.map(c=>c.close), h1h=h1.map(c=>c.high), h1l=h1.map(c=>c.low);
-  const m5c=m5.map(c=>c.close), m5h=m5.map(c=>c.high), m5l=m5.map(c=>c.low);
+  const m15c=m15.map(c=>c.close), m5c=m5.map(c=>c.close);
   const price = m5c[m5c.length-1];
 
-  // ── FÁZE 1: RANGE – BSL/SSL ────────────────────────────────
-  const range = detectRange(h1);
-  const atr   = range.atr;
-
-  $('p-atr').textContent   = (atr*10000).toFixed(1)+'p';
-  $('p-trend').textContent = price > calcEMA(h1c,50) ? 'BULL' : 'BEAR';
-  $('p-trend').style.color = $('p-trend').textContent==='BULL' ? 'var(--bull)' : 'var(--bear)';
-
-  renderInds('ind-h1','badge-h1',[
-    {n:'BSL (Sell-side target)', v:fmt(range.bsl),  s:'NEUTRAL'},
-    {n:'SSL (Buy-side target)',  v:fmt(range.ssl),   s:'NEUTRAL'},
-    {n:'High dotyky',           v:`${range.highTouches}x`, s:range.highTouches>=2?'BULL':'NEUTRAL'},
-    {n:'Low dotyky',            v:`${range.lowTouches}x`,  s:range.lowTouches>=2?'BULL':'NEUTRAL'},
-    {n:'Range velikost',        v:`${(range.rangeSize*10000).toFixed(0)}p (max ${(atr*3*10000).toFixed(0)}p)`,
-      s:range.isValid?'BULL':'NEUTRAL'},
-  ]);
-
-  if(range.isValid){
-    setPhase('range','pb-info','✓ RANGE POTVRZEN',
-      `BSL:${fmt(range.bsl)} SSL:${fmt(range.ssl)} | ${range.highTouches}H ${range.lowTouches}L`,
-      'info-active');
-    log(`RANGE H1: BSL ${fmt(range.bsl)} / SSL ${fmt(range.ssl)} | ${range.highTouches}×H ${range.lowTouches}×L`,'info');
+  // ── H1 BIAS (respektuje P.biasMode) ─────────────────────────
+  const h1EMA20 = calcEMA(h1c, P.emaBiasF);
+  const h1EMA50 = calcEMA(h1c, P.emaBiasS);
+  let h1Trend;
+  if(P.biasMode === 'ema50only') {
+    // Jednodušší: jen cena vs EMA50
+    h1Trend = h1c[h1c.length-1] > h1EMA50 ? 'BULL' : 'BEAR';
   } else {
-    setPhase('range','pb-wait','⏳ HLEDÁM RANGE',
-      `H:${range.highTouches}/2 L:${range.lowTouches}/2 | ${(range.rangeSize*10000).toFixed(0)}p`,'');
+    h1Trend = h1c[h1c.length-1] > h1EMA50 && h1EMA20 > h1EMA50 ? 'BULL'
+            : h1c[h1c.length-1] < h1EMA50 && h1EMA20 < h1EMA50 ? 'BEAR' : 'NEUTRAL';
   }
 
-  // ── FÁZE 2: INITIATION – Liquidity Grab + BOS ──────────────
-  const init = detectLiqGrabBOS(m15, atr);
+  $('p-trend').textContent = h1Trend;
+  $('p-trend').style.color = h1Trend==='BULL'?'var(--bull)':h1Trend==='BEAR'?'var(--bear)':'var(--neutral)';
+
+  // ── ATR ─────────────────────────────────────────────────────
+  const atr = calcATR(h1h, h1l, h1c);
+  $('p-atr').textContent = (atr*10000).toFixed(1)+'p';
+
+  // Zobraz H1 indikátory
+  renderInds('ind-h1','badge-h1',[
+    {n:'H1 Bias',     v:h1Trend, s:h1Trend==='BULL'?'BULL':h1Trend==='BEAR'?'BEAR':'NEUTRAL'},
+    {n:'EMA20',       v:fmt(h1EMA20), s:h1EMA20>h1EMA50?'BULL':'BEAR'},
+    {n:'EMA50',       v:fmt(h1EMA50), s:'NEUTRAL'},
+    {n:'ATR(14)',     v:(atr*10000).toFixed(1)+'p', s:'NEUTRAL'},
+  ]);
+
+  // ── FÁZE 1: RANGE (kontext) ──────────────────────────────────
+  const range = detectRange(h1);
+  if(h1Trend==='NEUTRAL'){
+    setPhase('range','pb-wait','⏸ NEUTRAL BIAS','H1 EMA20/50 bez jasného směru','');
+  } else {
+    setPhase('range','pb-info',`✓ BIAS ${h1Trend}`,
+      `EMA20:${fmt(h1EMA20,4)} EMA50:${fmt(h1EMA50,4)}`,'info-active');
+  }
+
+  // ── FÁZE 2: INITIATION – Grab+BOS (M15) ────────────────────
+  const atrM15 = calcATR(m15.map(c=>c.high), m15.map(c=>c.low), m15c);
+  const init = detectLiqGrabBOS_v2(m15, atrM15, P.grabMult, P.bodyMult, h1Trend);
 
   renderInds('ind-m15','badge-m15',[
-    {n:'Liquidity Grab', v:init.detected?`✓ @ ${fmt(init.grabLevel)}`:'ČEKÁM',
+    {n:'Grab+BOS',  v:init.detected?`${init.direction} @ ${fmt(init.grabLevel)}`:'ČEKÁM',
       s:init.detected?init.direction:'NEUTRAL'},
-    {n:'BOS potvrzení',  v:init.detected?(init.bosConfirmed?`✓ ${init.type}`:'GRAB bez BOS'):'–',
-      s:init.detected&&init.bosConfirmed?init.direction:'NEUTRAL'},
-    {n:'Směr',           v:init.detected?init.direction:'–', s:init.detected?init.direction:'NEUTRAL'},
-    {n:'Před',           v:init.detected?`${init.candlesAgo} svk zpět`:'–', s:'NEUTRAL'},
+    {n:'BOS level', v:init.detected?fmt(init.bosLevel):'–', s:'NEUTRAL'},
+    {n:'ATR M15',   v:(atrM15*10000).toFixed(1)+'p', s:'NEUTRAL'},
   ]);
 
-  if(init.detected && init.bosConfirmed){
+  if(init.detected && init.bosConfirmed && init.direction===h1Trend){
     const bc=init.direction==='BULL';
     setPhase('init',bc?'pb-bull':'pb-bear',
-      `✓ ${init.type} ${init.direction}`,
-      `Grab @ ${fmt(init.grabLevel)} → BOS @ ${fmt(init.bosLevel)}`,
+      `✓ GRAB+BOS ${init.direction}`,
+      `Grab:${fmt(init.grabLevel)} BOS:${fmt(init.bosLevel)}`,
       bc?'bull-active':'bear-active');
-    log(`GRAB+BOS M15: ${init.direction} | Grab:${fmt(init.grabLevel)} BOS:${fmt(init.bosLevel)}`,bc?'bull':'bear');
-  } else if(init.detected){
-    const bc=init.direction==='BULL';
-    setPhase('init',bc?'pb-bull':'pb-bear',
-      `⚡ GRAB ${init.direction} (čekám BOS)`,
-      `Grab @ ${fmt(init.grabLevel)} | BOS level: ${fmt(init.bosLevel)}`,
-      bc?'bull-active':'bear-active');
+    log(`GRAB+BOS ${init.direction} @ ${fmt(init.grabLevel)}`,bc?'bull':'bear');
   } else {
-    setPhase('init','pb-wait','⏳ ČEKÁM NA GRAB','Sleduji swing high/low M15...','');
+    setPhase('init','pb-wait','⏳ ČEKÁM NA GRAB+BOS',
+      h1Trend==='NEUTRAL'?'Čekám na H1 bias...':'Sleduji M15 swing high/low...','');
   }
 
-  // ── FÁZE 3: MITIGATION – Order Block + FVG ─────────────────
-  const direction = init.detected ? init.direction : null;
-  const obM15 = direction ? detectOrderBlock(m15, direction, atr) : null;
-  const obM5  = direction ? detectOrderBlock(m5,  direction, atr) : null;
-  const activeOB = obM5 || obM15; // preferuj M5 OB jako přesnější vstup
-  const inOB = activeOB ? checkMitigation(price, activeOB, direction) : false;
+  // ── FÁZE 3: MITIGATION – Order Block ───────────────────────
+  const dir = init.detected && init.bosConfirmed ? init.direction : null;
+  const obM5  = dir ? detectOrderBlock(m5,  dir, atrM15) : null;
+  const obM15 = dir ? detectOrderBlock(m15, dir, atrM15) : null;
+  const activeOB = obM5 || obM15;
+  const obMarginDecimal = P.obMargin * 0.0001;
+  const inOB = activeOB ?
+    price >= activeOB.bottom - obMarginDecimal &&
+    price <= activeOB.top    + obMarginDecimal : false;
 
   renderInds('ind-m5','badge-m5',[
-    {n:'Order Block M15', v:obM15?`${fmt(obM15.bottom)}–${fmt(obM15.top)}`:'NENALEZEN',
-      s:obM15?direction:'NEUTRAL'},
-    {n:'Order Block M5',  v:obM5?`${fmt(obM5.bottom)}–${fmt(obM5.top)}`:'NENALEZEN',
-      s:obM5?direction:'NEUTRAL'},
-    {n:'FVG v OB',        v:activeOB?.hasFVG?`✓ ${fmt(activeOB.fvgBottom)}–${fmt(activeOB.fvgTop)}`:'–',
-      s:activeOB?.hasFVG?direction:'NEUTRAL'},
-    {n:'Cena v OB',       v:inOB?'⚡ ANO':'NE', s:inOB?direction:'NEUTRAL'},
-    {n:'OB velikost',     v:activeOB?`${activeOB.size.toFixed(1)}p`:'–', s:'NEUTRAL'},
+    {n:'Order Block', v:activeOB?`${fmt(activeOB.bottom)}–${fmt(activeOB.top)}`:'HLEDÁM',
+      s:activeOB?dir:'NEUTRAL'},
+    {n:'V OB zóně',  v:inOB?'⚡ ANO':'NE', s:inOB?dir:'NEUTRAL'},
+    {n:'FVG v OB',   v:activeOB?.hasFVG?'✓ ANO':'NE', s:activeOB?.hasFVG?dir:'NEUTRAL'},
+    {n:'OB tf',      v:obM5?'M5':obM15?'M15':'–', s:'NEUTRAL'},
   ]);
 
-  if(inOB && activeOB?.hasFVG){
-    const bc=direction==='BULL';
+  if(inOB){
+    const bc=dir==='BULL';
     setPhase('mit',bc?'pb-bull':'pb-bear',
-      `✓ OB+FVG ${direction}`,
-      `OB: ${fmt(activeOB.bottom)}–${fmt(activeOB.top)} | FVG uvnitř`,
+      `✓ OB ${dir}${activeOB.hasFVG?' +FVG':''}`,
+      `${fmt(activeOB.bottom)}–${fmt(activeOB.top)} | ${obM5?'M5':'M15'}`,
       bc?'bull-active':'bear-active');
-    log(`OB+FVG confluence ${direction}: ${fmt(activeOB.bottom)}–${fmt(activeOB.top)}`,bc?'bull':'bear');
-  } else if(inOB){
-    const bc=direction==='BULL';
-    setPhase('mit',bc?'pb-bull':'pb-bear',
-      `⚡ V OB (bez FVG) ${direction}`,
-      `OB: ${fmt(activeOB.bottom)}–${fmt(activeOB.top)} | čekám FVG`,
-      bc?'bull-active':'bear-active');
-  } else if(activeOB){
-    const dist=(Math.abs(price-(activeOB.top+activeOB.bottom)/2)*10000).toFixed(0);
+    log(`OB hit ${dir}: ${fmt(activeOB.bottom)}–${fmt(activeOB.top)}`,bc?'bull':'bear');
+  } else {
+    const dist = activeOB ? (Math.abs(price-(activeOB.top+activeOB.bottom)/2)*10000).toFixed(0)+'p' : '–';
     setPhase('mit','pb-wait','⏳ ČEKÁM NA OB',
-      `OB @ ${fmt(activeOB.bottom)}–${fmt(activeOB.top)} | ${dist}p daleko`,'');
-  } else {
-    setPhase('mit','pb-wait','⏳ HLEDÁM ORDER BLOCK','Čekám na impulzní pohyb...','');
+      activeOB ? `OB nalezen, vzdálenost ${dist}` : 'Hledám Order Block...','');
   }
 
-  // ── FÁZE 4: CONTINUATION – M5 MSS (HH/LL) ─────────────────
-  // Sleduj strukturu od momentu kdy cena vstoupila do OB
-  const obEntryIdx = inOB ? m5.length-5 : m5.length-15;
-  const mss = direction ? detectMSS(m5, direction, obEntryIdx) : { detected:false };
+  // ── FÁZE 4: CONTINUATION – MSS ─────────────────────────────
+  const mssResult = (dir && inOB) ? detectMSS(m5, dir, m5.length - (P.mssWindow || 12)) : {detected:false};
 
-  renderInds('ind-h1','badge-h1',[
-    {n:'H1 Bias (EMA50)',  v:$('p-trend').textContent, s:$('p-trend').textContent},
-    {n:'MSS na M5',        v:mss.detected?`✓ ${mss.type} @ ${fmt(mss.newLevel)}`:'ČEKÁM',
-      s:mss.detected?direction:'NEUTRAL'},
-    {n:'Čistá struktura',  v:mss.detected?(mss.clean?'✓ ANO':'ČÁSTEČNÁ'):'–',
-      s:mss.detected&&mss.clean?direction:'NEUTRAL'},
-    {n:'Předchozí level',  v:mss.detected?fmt(mss.prevLevel):'–', s:'NEUTRAL'},
-    {n:'Order flow',       v:inOB&&mss.detected?'✓ POTVRZEN':inOB?'ČEKÁM NA MSS':'–',
-      s:inOB&&mss.detected?direction:'NEUTRAL'},
+  // Update M5 indicators with MSS info (don't overwrite H1!)
+  renderInds('ind-m5','badge-m5',[
+    {n:'Order Block', v:activeOB?`${fmt(activeOB.bottom)}–${fmt(activeOB.top)}`:'HLEDÁM',
+      s:activeOB?dir:'NEUTRAL'},
+    {n:'V OB zóně',  v:inOB?'⚡ ANO':'NE', s:inOB?dir:'NEUTRAL'},
+    {n:'FVG v OB',   v:activeOB?.hasFVG?'✓ ANO':'NE', s:activeOB?.hasFVG?dir:'NEUTRAL'},
+    {n:'MSS M5',     v:mssResult.detected?`✓ ${mssResult.type}`:'ČEKÁM',
+      s:mssResult.detected?dir:'NEUTRAL'},
   ]);
 
-  if(mss.detected){
-    const bc=direction==='BULL';
+  if(mssResult.detected){
+    const bc=dir==='BULL';
     setPhase('cont',bc?'pb-bull':'pb-bear',
-      `✓ MSS ${mss.type} ${direction}${mss.clean?' (CLEAN)':''}`,
-      `${mss.type}: ${fmt(mss.prevLevel)} → ${fmt(mss.newLevel)}`,
+      `✓ MSS ${mssResult.type} ${dir}`,
+      `${fmt(mssResult.newLevel)} > ${fmt(mssResult.prevLevel)}`,
       bc?'bull-active':'bear-active');
-    log(`MSS M5 ${direction}: ${mss.type} @ ${fmt(mss.newLevel)}${mss.clean?' CLEAN':''}`,bc?'bull':'bear');
   } else {
-    setPhase('cont','pb-wait','⏳ ČEKÁM NA HH/LL',
-      direction ? `Sleduji M5 ${direction==='BULL'?'Higher High':'Lower Low'}...` : 'Nejdříve GRAB+BOS','');
+    setPhase('cont','pb-wait','⏳ ČEKÁM NA MSS',
+      dir&&inOB?`M5 ${dir==='BULL'?'Higher High':'Lower Low'}...`:'Čekám na OB vstup...','');
   }
 
-  // ── FINÁLNÍ SIGNÁL – všechny 4 fáze musí být splněny ───────
-  // Kvalita signálu:
-  //   PREMIUM = GRAB+BOS + OB s FVG + CLEAN MSS
-  //   STANDARD = GRAB+BOS + OB (bez FVG) + MSS
-  const isPremiumBull = init.detected && init.direction==='BULL' && init.bosConfirmed &&
-                        inOB && activeOB?.hasFVG && mss.detected && mss.clean;
-  const isStandardBull= init.detected && init.direction==='BULL' && init.bosConfirmed &&
-                        inOB && mss.detected;
-  const isPremiumBear = init.detected && init.direction==='BEAR' && init.bosConfirmed &&
-                        inOB && activeOB?.hasFVG && mss.detected && mss.clean;
-  const isStandardBear= init.detected && init.direction==='BEAR' && init.bosConfirmed &&
-                        inOB && mss.detected;
+  // ── FINÁLNÍ SIGNÁL ──────────────────────────────────────────
+  // ── FINÁLNÍ SIGNÁL (respektuje P.reqMSS / biasMode) ──────
+  const mssOK = P.reqMSS ? mssResult.detected : true;
+  const biasOK = P.biasMode === 'ema50only'
+    ? h1Trend !== 'NEUTRAL' || h1c[h1c.length-1] !== h1EMA50 // always pick a side
+    : h1Trend !== 'NEUTRAL';
+
+  const allBull = (P.biasMode==='ema50only' ? h1c[h1c.length-1]>h1EMA50 : h1Trend==='BULL')
+                  && init.detected && init.direction==='BULL' && init.bosConfirmed && inOB && mssOK;
+  const allBear = (P.biasMode==='ema50only' ? h1c[h1c.length-1]<h1EMA50 : h1Trend==='BEAR')
+                  && init.detected && init.direction==='BEAR' && init.bosConfirmed && inOB && mssOK;
+  const isPremium = activeOB?.hasFVG === true;
 
   const sc=$('sig-card'), sd=$('sig-dir'), sf=$('sig-conf'), sb=$('sig-bar');
 
-  // SL = pod OB bottom (bull) nebo nad OB top (bear)
-  // TP = 2:1 RR od SL
-  if(isPremiumBull || isStandardBull){
-    const isPremium = isPremiumBull;
-    const conf = isPremium ? 85 : 65;
-    const sl   = activeOB.bottom - atr*0.2;
-    const risk = price - sl;
-    const tp   = price + risk*2;
-    sc.className='signal-card bullish';
-    sd.className='sig-dir bull'; sd.textContent=`▲ BUY${isPremium?' ★':''}`;
-    sf.textContent=`${isPremium?'PREMIUM':'STANDARD'} setup | ${conf}%`;
-    sb.className='conf-fill cf-bull'; sb.style.width=conf+'%';
-    $('sig-entry').textContent=fmt(price);
-    $('sig-tp').textContent=fmt(tp);
-    $('sig-sl').textContent=fmt(sl);
-    // Fire alert (deduplikace – stejný signal hash nespouštěj 2x)
-    const sigHashBull = `BULL_${fmt(price)}_${fmt(sl)}`;
-    if(lastSignalHash !== sigHashBull) {
-      lastSignalHash = sigHashBull;
-      fireAlert('BULL', price, tp, sl, conf, isPremium);
-      if(!activeTrade) {
-        const lot = calcLotSize(price, sl);
-        openTrade('BULL', price, sl, tp, lot, isPremium);
+  if(allBull || allBear){
+    const isBull = allBull;
+    const conf   = isPremium ? 85 : 68;
+    const slDec  = P.slPips * 0.0001;
+    const sl     = isBull
+      ? activeOB.bottom - slDec
+      : activeOB.top    + slDec;
+    const risk = Math.abs(price - sl);
+    const tp   = isBull ? price + risk * P.rrRatio : price - risk * P.rrRatio;
+    const slPips = Math.abs(price-sl)*10000;
+
+    // SL filtr
+    if(slPips >= P.minSLpips && slPips <= P.maxSLpips){
+      sc.className=`signal-card ${isBull?'bullish':'bearish'}`;
+      sd.className=`sig-dir ${isBull?'bull':'bear'}`;
+      sd.textContent=`${isBull?'▲ BUY':'▼ SELL'}${isPremium?' ★':''}`;
+      sf.textContent=`${isPremium?'PREMIUM':'STANDARD'} | ${conf}% | SL:${slPips.toFixed(0)}p`;
+      sb.className=`conf-fill ${isBull?'cf-bull':'cf-bear'}`;
+      sb.style.width=conf+'%';
+      $('sig-entry').textContent=fmt(price);
+      $('sig-tp').textContent=fmt(tp);
+      $('sig-sl').textContent=fmt(sl);
+
+      const sigHash=`${isBull?'BULL':'BEAR'}_${fmt(price)}_${fmt(sl)}`;
+      if(lastSignalHash!==sigHash){
+        lastSignalHash=sigHash;
+        const alertId = fireAlert(isBull?'BULL':'BEAR',price,tp,sl,conf,isPremium);
+        if(!activeTrade && alertId){
+          const lot=calcLotSize(price,sl);
+          openTrade(isBull?'BULL':'BEAR',price,sl,tp,lot,isPremium, alertId);
+        }
       }
+      log(`${isPremium?'★ ':''}${isBull?'🟢 BUY':'🔴 SELL'} @ ${fmt(price)} SL:${slPips.toFixed(0)}p TP:${(Math.abs(tp-price)*10000).toFixed(0)}p`,isBull?'bull':'bear');
     }
-    log(`🟢 ${isPremium?'★ PREMIUM':'STANDARD'} BUY @ ${fmt(price)} | TP:${fmt(tp)} SL:${fmt(sl)}`, 'bull');
-  } else if(isPremiumBear || isStandardBear){
-    const isPremium = isPremiumBear;
-    const conf = isPremium ? 85 : 65;
-    const sl   = activeOB.top + atr*0.2;
-    const risk = sl - price;
-    const tp   = price - risk*2;
-    sc.className='signal-card bearish';
-    sd.className='sig-dir bear'; sd.textContent=`▼ SELL${isPremium?' ★':''}`;
-    sf.textContent=`${isPremium?'PREMIUM':'STANDARD'} setup | ${conf}%`;
-    sb.className='conf-fill cf-bear'; sb.style.width=conf+'%';
-    $('sig-entry').textContent=fmt(price);
-    $('sig-tp').textContent=fmt(tp);
-    $('sig-sl').textContent=fmt(sl);
-    const sigHashBear = `BEAR_${fmt(price)}_${fmt(sl)}`;
-    if(lastSignalHash !== sigHashBear) {
-      lastSignalHash = sigHashBear;
-      fireAlert('BEAR', price, tp, sl, conf, isPremium);
-      if(!activeTrade) {
-        const lot = calcLotSize(price, sl);
-        openTrade('BEAR', price, sl, tp, lot, isPremium);
-      }
-    }
-    log(`🔴 ${isPremium?'★ PREMIUM':'STANDARD'} SELL @ ${fmt(price)} | TP:${fmt(tp)} SL:${fmt(sl)}`, 'bear');
   } else {
-    // Zobraz progress – která fáze chybí
-    const p1=range.isValid, p2=init.detected&&init.bosConfirmed, p3=inOB, p4=mss.detected;
-    const phasesOk=[p1,p2,p3,p4].filter(Boolean).length;
     sc.className='signal-card';
     sd.className='sig-dir neutral'; sd.textContent='ČEKÁM';
-    sf.textContent=`Splněno ${phasesOk}/4 fází`;
-    sb.className='conf-fill cf-neutral';
-    sb.style.width=Math.max(8, phasesOk*22)+'%';
+    const phases=[h1Trend!=='NEUTRAL',init.detected&&init.bosConfirmed,inOB,mssResult.detected].filter(Boolean).length;
+    sf.textContent=`Splněno ${phases}/4 fází`;
+    sb.className='conf-fill cf-neutral'; sb.style.width=Math.max(8,phases*22)+'%';
     $('sig-entry').textContent='–'; $('sig-tp').textContent='–'; $('sig-sl').textContent='–';
+    if(h1Trend!=='NEUTRAL'&&lastSignalHash) lastSignalHash=null;
   }
 
-  // ── ZÓNY ───────────────────────────────────────────────────
-  const zones = [
-    {type:'BSL', top:range.bsl+atr*0.1, bottom:range.bsl-atr*0.1, tf:'H1'},
-    {type:'SSL', top:range.ssl+atr*0.1, bottom:range.ssl-atr*0.1, tf:'H1'},
-    ...(obM15?[{type:'OB', top:obM15.top, bottom:obM15.bottom, tf:'M15',
-                hasFVG:obM15.hasFVG}]:[]),
-    ...(obM5?[{type:'OB', top:obM5.top, bottom:obM5.bottom, tf:'M5',
-               hasFVG:obM5.hasFVG}]:[]),
-    ...(init.detected?[{type:'BOS', top:init.bosLevel+atr*0.15,
-                         bottom:init.bosLevel-atr*0.15, tf:'M15'}]:[]),
-  ];
+  // ── ZÓNY ────────────────────────────────────────────────────
+  const zones=[];
+  if(range.isValid) zones.push({type:'range',top:range.rangeHigh,bottom:range.rangeLow,tf:'H1',fresh:true});
+  if(init.detected) zones.push({type:'BOS',top:init.bosLevel+atrM15*0.2,bottom:init.bosLevel-atrM15*0.2,tf:'M15',fresh:true});
+  if(obM15) zones.push({type:'OB',top:obM15.top,bottom:obM15.bottom,tf:'M15',hasFVG:obM15.hasFVG,fresh:true});
+  if(obM5)  zones.push({type:'OB',top:obM5.top, bottom:obM5.bottom, tf:'M5', hasFVG:obM5.hasFVG, fresh:true});
 
   const zEl=$('zones-list');
-  if(!zones.length){
-    zEl.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Žádné aktivní zóny</div>';
-    return;
-  }
-  const typeLabel = {BSL:'BSL 🎯',SSL:'SSL 🎯',OB:'Order Block',BOS:'BOS Level'};
-  const typeCls   = {BSL:'zt-range',SSL:'zt-range',OB:'zt-bos',BOS:'zt-bos'};
+  if(!zones.length){zEl.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Žádné aktivní zóny</div>';return;}
+  const tl={range:'Range H1',BOS:'BOS Level',OB:'Order Block'};
+  const tc={range:'zt-range',BOS:'zt-bos',OB:'zt-bos'};
   zEl.innerHTML=zones.map(z=>{
     const dist=(Math.abs(price-(z.top+z.bottom)/2)*10000).toFixed(0);
     const inZ=price>=z.bottom&&price<=z.top;
-    const fvgBadge=z.hasFVG?' +FVG':'';
     return`<div class="zone-item">
-      <span class="zt ${typeCls[z.type]||'zt-range'}">${typeLabel[z.type]||z.type}${fvgBadge}</span>
+      <span class="zt ${tc[z.type]}">${tl[z.type]||z.type}${z.hasFVG?' +FVG':''}</span>
       <div class="zone-info">
-        <div class="zone-range">${fmt(z.bottom)} – ${fmt(z.top)}</div>
-        <div class="zone-meta">${z.tf} · ${dist} pips${inZ?' · <span class="zone-in">⚡ V ZÓNĚ</span>':''}</div>
+        <div class="zone-range">${fmt(z.bottom)}–${fmt(z.top)}</div>
+        <div class="zone-meta">${z.tf} · ${dist}p${inZ?' · <span class="zone-in">⚡ V ZÓNĚ</span>':''}</div>
       </div>
     </div>`;
   }).join('');
 }
-
 
 // ============================================================
 // FETCH DATA
@@ -1929,20 +1881,14 @@ async function fetchAndAnalyze(){
 // SESSION WINDOW (London 08:00–11:00 CET, NY 14:30–17:30 CET)
 // ============================================================
 const SESSIONS = [
-  { name: 'London', start: { h:8,  m:0  }, end: { h:11, m:0  } },
-  { name: 'New York', start: { h:14, m:30 }, end: { h:17, m:30 } },
+  { name: 'London',   start: { h:6,  m:30 }, end: { h:12, m:0  } },  // xwide
+  { name: 'New York', start: { h:12, m:30 }, end: { h:17, m:30 } },  // xwide
 ];
 
 function getCETMinutes() {
-  // CET = UTC+1, CEST = UTC+2 (letní čas)
+  // Sessions jsou definované v UTC, takže použijeme přímo UTC
   const now = new Date();
-  const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
-  // Zjisti letní čas pomocí timezone offset
-  const janOffset = new Date(now.getFullYear(), 0, 1).getTimezoneOffset();
-  const julOffset = new Date(now.getFullYear(), 6, 1).getTimezoneOffset();
-  const isDST = now.getTimezoneOffset() < Math.max(janOffset, julOffset);
-  const cetOffset = isDST ? 120 : 60; // CEST=+2, CET=+1
-  return (utcMin + cetOffset) % (24 * 60);
+  return now.getUTCHours() * 60 + now.getUTCMinutes();
 }
 
 function getActiveSession() {
@@ -2001,7 +1947,7 @@ function renderSessionBanner() {
     banner.innerHTML = `
       ⏸ <strong style="color:var(--text)">MIMO TRADING SESSION</strong><br>
       API se neobnovuje – šetřím kredity.<br>
-      🕐 London 08:00–11:00 CET &nbsp;|&nbsp; NY 14:30–17:30 CET<br>
+      🕐 London 06:30–12:00 UTC &nbsp;|&nbsp; NY 12:30–17:30 UTC<br>
       ▶ Další session: <strong style="color:var(--accent)">${next.session.name}</strong> za <strong style="color:var(--accent)">${h}h ${m}m</strong>
     `;
     // vlož za api-notice
@@ -2049,646 +1995,13 @@ if (initSession) {
 }
 startAutoRefresh();
 
-// ============================================================
-// BACKTEST ENGINE
-// ============================================================
-let btRawCandles = [];   // všechny svíčky z CSV
-let btTrades     = [];   // výsledné obchody
-let btFilter_cur = 'all';
 
-// ── CSV Parser (histdata.com formáty) ──────────────────────
-// Formát 1: YYYYMMDD HHMMSS;O;H;L;C;V  (M1 tick)
-// Formát 2: YYYY.MM.DD,HH:MM,O,H,L,C,V (MT4 export)
-// Formát 3: Date,Time,Open,High,Low,Close,Volume
-function parseHistdataCSV(text) {
-  const lines = text.trim().split('\n').filter(l=>l.trim());
-  const candles = [];
-  // Detekuj separator
-  const sep = lines[0].includes(';') ? ';' : ',';
-  // Přeskoč header pokud existuje
-  const startIdx = isNaN(parseFloat(lines[0].split(sep)[2])) ? 1 : 0;
 
-  for(let i=startIdx; i<lines.length; i++){
-    const p = lines[i].trim().split(sep);
-    if(p.length < 5) continue;
-    try {
-      let dt, o, h, l, c;
-      // Formát s datetime v prvním sloupci (YYYYMMDD HHMMSS nebo YYYY.MM.DD HH:MM)
-      if(p[0].length >= 8 && p[1] && (p[1].length === 6 || p[1].includes(':'))){
-        const ds = p[0].replace(/\./g,'');
-        const ts = p[1].replace(/:/g,'').padEnd(6,'0');
-        const yr=+ds.slice(0,4), mo=+ds.slice(4,6)-1, dy=+ds.slice(6,8);
-        const hr=+ts.slice(0,2), mn=+ts.slice(2,4);
-        dt = new Date(Date.UTC(yr,mo,dy,hr,mn));
-        o=+p[2]; h=+p[3]; l=+p[4]; c=+p[5];
-      } else {
-        // Datetime v jednom sloupci
-        dt = new Date(p[0]);
-        o=+p[1]; h=+p[2]; l=+p[3]; c=+p[4];
-      }
-      if(isNaN(dt.getTime())||isNaN(o)||o<=0) continue;
-      candles.push({dt, open:o, high:h, low:l, close:c});
-    } catch(e){}
-  }
-  candles.sort((a,b)=>a.dt-b.dt);
-  return candles;
-}
 
-// ── Resample na vyšší TF ───────────────────────────────────
-function resampleCandles(candles, tfMinutes) {
-  if(!candles.length) return [];
-  const out = [];
-  let bucket = null;
-  const tfMs = tfMinutes * 60000;
 
-  for(const c of candles){
-    const slotTime = new Date(Math.floor(c.dt.getTime()/tfMs)*tfMs);
-    if(!bucket || slotTime.getTime() !== bucket.dt.getTime()){
-      if(bucket) out.push(bucket);
-      bucket = { dt:slotTime, open:c.open, high:c.high, low:c.low, close:c.close };
-    } else {
-      bucket.high  = Math.max(bucket.high, c.high);
-      bucket.low   = Math.min(bucket.low,  c.low);
-      bucket.close = c.close;
-    }
-  }
-  if(bucket) out.push(bucket);
-  return out;
-}
 
-// ── Session filtr ──────────────────────────────────────────
-function inSession(dt, sessionFilter) {
-  if(sessionFilter==='all') return true;
-  const h = dt.getUTCHours(), m = dt.getUTCMinutes();
-  const totMin = h*60+m;
-  // London = 07:00–10:00 UTC, NY = 13:30–16:30 UTC
-  const inLondon = totMin>=420  && totMin<600;
-  const inNY     = totMin>=810  && totMin<990;
-  if(sessionFilter==='london') return inLondon;
-  if(sessionFilter==='ny')     return inNY;
-  if(sessionFilter==='both')   return inLondon||inNY;
-  return true;
-}
 
-// ── Hlavní backtest smyčka ────────────────────────────────
-function runBacktest() {
-  const btn = document.getElementById('bt-run-btn');
-  const prog = document.getElementById('bt-progress');
-  const progFill = document.getElementById('bt-prog-fill');
-  if(!btRawCandles.length){ alert('Nejprve nahraj CSV soubor!'); return; }
 
-  btn.disabled=true;
-  prog.style.display='block';
-  progFill.style.width='0%';
-
-  // Async aby UI nezamrzlo
-  setTimeout(()=>{
-    const tfMin      = parseInt(document.getElementById('bt-tf').value);
-    const rrRatio    = parseFloat(document.getElementById('bt-rr').value);
-    const sessFilter = document.getElementById('bt-session').value;
-    const setupFilter= document.getElementById('bt-setup').value;
-    const spreadPips = parseFloat(document.getElementById('bt-spread').value);
-    const slippagePips=parseFloat(document.getElementById('bt-slippage').value);
-    const commission = parseFloat(document.getElementById('bt-commission').value);
-    const minSLpips  = parseFloat(document.getElementById('bt-minsl').value);
-    const totalCostPips = spreadPips + slippagePips; // celkové náklady na vstup v pipech
-    const pipValue   = 10; // $10/pip pro 1 lot GBPUSD USD účet
-
-    // Resample na zvolený TF
-    const candles5  = resampleCandles(btRawCandles, 5);
-    const candles15 = resampleCandles(btRawCandles, 15);
-    const candles60 = resampleCandles(btRawCandles, 60);
-
-    progFill.style.width='20%';
-
-    btTrades = [];
-    const LOOKBACK_H1  = 30;
-    const LOOKBACK_M15 = 30;
-    const LOOKBACK_M5  = 20;
-    const MIN_CANDLES  = Math.max(LOOKBACK_H1, LOOKBACK_M15, LOOKBACK_M5) + 5;
-
-    // Iteruj přes M15 svíčky jako hlavní časová osa
-    for(let i=MIN_CANDLES; i<candles15.length; i++){
-      const dt = candles15[i].dt;
-      if(!inSession(dt, sessFilter)) continue;
-
-      // Sesbírej context svíčky do aktuálního bodu
-      const h1Idx  = candles60.findIndex(c=>c.dt>=dt);
-      const m5Idx  = candles5.findIndex(c=>c.dt>=dt);
-      if(h1Idx<LOOKBACK_H1||m5Idx<LOOKBACK_M5) continue;
-
-      const h1slice  = candles60.slice(h1Idx-LOOKBACK_H1, h1Idx);
-      const m15slice = candles15.slice(i-LOOKBACK_M15, i);
-      const m5slice  = candles5.slice(m5Idx-LOOKBACK_M5, m5Idx);
-      if(h1slice.length<10||m15slice.length<10||m5slice.length<5) continue;
-
-      // Spusť RIMC logiku
-      const atr    = calcATR(h1slice.map(c=>c.high), h1slice.map(c=>c.low), h1slice.map(c=>c.close));
-      const range  = detectRange(h1slice);
-      const init   = detectLiqGrabBOS(m15slice, atr);
-      if(!init.detected || !init.bosConfirmed) continue;
-
-      const obM5   = detectOrderBlock(m5slice, init.direction, atr);
-      const obM15  = detectOrderBlock(m15slice, init.direction, atr);
-      const activeOB = obM5 || obM15;
-      if(!activeOB) continue;
-
-      const price  = candles15[i].close;
-      const inOB   = price>=activeOB.bottom && price<=activeOB.top;
-      if(!inOB) continue;
-
-      const mss    = detectMSS(m5slice, init.direction, m5slice.length-8);
-      if(!mss.detected) continue;
-
-      const isPremium = activeOB.hasFVG && mss.clean;
-      if(setupFilter==='premium' && !isPremium) continue;
-      if(setupFilter==='standard' && isPremium) continue;
-
-      // Vypočítej SL/TP s realism faktorem
-      const dir  = init.direction;
-      let entry, sl, tp;
-      const spreadDecimal  = spreadPips  * 0.0001;
-      const slippageDecimal= slippagePips* 0.0001;
-      if(dir==='BULL'){
-        entry = price + spreadDecimal + slippageDecimal; // horší entry kvůli spreadu
-        sl    = activeOB.bottom - atr*0.2;
-        tp    = entry + (entry-sl)*rrRatio;
-      } else {
-        entry = price - spreadDecimal - slippageDecimal; // horší entry kvůli spreadu
-        sl    = activeOB.top + atr*0.2;
-        tp    = entry - (sl-entry)*rrRatio;
-      }
-      const slPips = Math.abs(entry-sl)*10000;
-      if(slPips < minSLpips || slPips > 80) continue; // filtr dle min SL nastavení
-
-      // Simuluj výsledek – hledej hit v následujících svíčkách (max 48h = 192×M15)
-      let result='open', exitDt=null, exitPrice=null;
-      const futureM15 = candles15.slice(i+1, i+1+192);
-      for(const fc of futureM15){
-        if(dir==='BULL'){
-          if(fc.low<=sl){  result='sl'; exitDt=fc.dt; exitPrice=sl; break; }
-          if(fc.high>=tp){ result='tp'; exitDt=fc.dt; exitPrice=tp; break; }
-        } else {
-          if(fc.high>=sl){ result='sl'; exitDt=fc.dt; exitPrice=sl; break; }
-          if(fc.low<=tp){  result='tp'; exitDt=fc.dt; exitPrice=tp; break; }
-        }
-      }
-      if(result==='open') continue; // nevyhodnocený obchod – přeskoč
-
-      // Komisní náklady v R (commission / (slPips × pipValue × lot))
-      // Zjednodušení: odečteme komisní náklady jako podíl R
-      const lot = CONFIG.balance * (CONFIG.riskPct/100) / (slPips * pipValue);
-      const commissionR = commission * lot * 2 / (CONFIG.balance * CONFIG.riskPct/100); // round-trip
-      const rPnl = (result==='tp' ? rrRatio : -1) - commissionR;
-
-      btTrades.push({
-        dt, exitDt, dir, entry, sl, tp, slPips: slPips.toFixed(1),
-        result, rPnl: parseFloat(rPnl.toFixed(3)), isPremium,
-        month: dt.toISOString().slice(0,7),
-        spread: spreadPips, slippage: slippagePips, commission,
-      });
-
-      // Přeskoč dalších min 4h aby nedošlo k duplicitám ze stejné zóny
-      i += 16;
-    }
-
-    progFill.style.width='80%';
-    renderBacktestResults(rrRatio);
-    captureBacktestResult(btTrades, rrRatio, tfMin, sessFilter, setupFilter, spreadPips, slippagePips, commission);
-    progFill.style.width='100%';
-    setTimeout(()=>{ prog.style.display='none'; btn.disabled=false; }, 500);
-  }, 50);
-}
-
-// ── Render výsledků ────────────────────────────────────────
-function renderBacktestResults(rrRatio) {
-  const trades = btTrades;
-  if(!trades.length){
-    document.getElementById('bt-results').style.display='block';
-    document.getElementById('bt-trade-list').innerHTML=
-      '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Žádné obchody nenalezeny. Zkus jiný TF nebo session filtr.</div>';
-    return;
-  }
-
-  const tp    = trades.filter(t=>t.result==='tp').length;
-  const sl    = trades.filter(t=>t.result==='sl').length;
-  const total = tp+sl;
-  const wr    = total>0 ? (tp/total*100).toFixed(1) : 0;
-  const netR  = trades.reduce((a,t)=>a+t.rPnl,0).toFixed(2);
-  const grossW= trades.filter(t=>t.result==='tp').reduce((a,t)=>a+t.rPnl,0);
-  const grossL= Math.abs(trades.filter(t=>t.result==='sl').reduce((a,t)=>a+t.rPnl,0));
-  const pf    = grossL>0 ? (grossW/grossL).toFixed(2) : '∞';
-  const avgRR = total>0 ? (trades.reduce((a,t)=>a+t.rPnl,0)/total).toFixed(2) : 0;
-
-  // Max drawdown
-  let peak=0,eq=0,maxDD=0;
-  trades.forEach(t=>{ eq+=t.rPnl; if(eq>peak)peak=eq; maxDD=Math.max(maxDD,peak-eq); });
-
-  // Max consecutive losses
-  let maxLoss=0,curLoss=0;
-  trades.forEach(t=>{ t.result==='sl'?(curLoss++,maxLoss=Math.max(maxLoss,curLoss)):curLoss=0; });
-
-  // Premium WR
-  const premTrades = trades.filter(t=>t.isPremium);
-  const premTP = premTrades.filter(t=>t.result==='tp').length;
-  const premWR = premTrades.length>0 ? (premTP/premTrades.length*100).toFixed(1)+'%' : '–';
-
-  // Update KPI
-  const setKPI = (id,val,cls) => {
-    document.getElementById(id).textContent=val;
-    document.getElementById(id).parentElement.className='bt-kpi '+cls;
-  };
-  setKPI('bk-wr',    wr+'%',      wr>=50?'pos':'neg');
-  setKPI('bk-pf',    pf,          pf>=1.2?'pos':'neg');
-  setKPI('bk-dd',    maxDD.toFixed(1)+'R', maxDD<5?'neu':'warn');
-  setKPI('bk-rr',    avgRR+'R',   avgRR>=0?'pos':'neg');
-  setKPI('bk-total', total,       'neu');
-  setKPI('bk-net',   netR+'R',    netR>=0?'pos':'neg');
-  setKPI('bk-premium-wr', premWR, premTP/Math.max(premTrades.length,1)>=0.5?'pos':'neg');
-  setKPI('bk-consec', maxLoss,    maxLoss<=3?'neu':'warn');
-
-  // Equity curve
-  drawEquityCurve(trades);
-  drawMonthlyChart(trades);
-
-  document.getElementById('bt-results').style.display='block';
-  renderTradeList('all');
-}
-
-function drawEquityCurve(trades) {
-  const canvas = document.getElementById('bt-equity-canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width  = canvas.offsetWidth * window.devicePixelRatio;
-  canvas.height = 140 * window.devicePixelRatio;
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  const W=canvas.offsetWidth, H=140;
-
-  // Build equity series
-  let eq=0;
-  const series=[0];
-  trades.forEach(t=>{ eq+=t.rPnl; series.push(eq); });
-
-  const minEq=Math.min(...series), maxEq=Math.max(...series);
-  const range=maxEq-minEq||1;
-  const pad=16;
-
-  const x = i => pad + (i/(series.length-1))*(W-pad*2);
-  const y = v => (H-pad) - ((v-minEq)/range)*(H-pad*2);
-
-  // Grid lines
-  ctx.strokeStyle='rgba(30,45,61,0.8)'; ctx.lineWidth=1;
-  [0,0.25,0.5,0.75,1].forEach(t=>{
-    const yy=pad+(1-t)*(H-pad*2);
-    ctx.beginPath(); ctx.moveTo(pad,yy); ctx.lineTo(W-pad,yy); ctx.stroke();
-  });
-
-  // Zero line
-  if(minEq<0 && maxEq>0){
-    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(pad,y(0)); ctx.lineTo(W-pad,y(0)); ctx.stroke();
-  }
-
-  // Fill
-  const grad=ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0,'rgba(0,230,118,0.25)');
-  grad.addColorStop(1,'rgba(0,230,118,0.02)');
-  ctx.fillStyle=grad;
-  ctx.beginPath();
-  ctx.moveTo(x(0),H-pad);
-  series.forEach((v,i)=>ctx.lineTo(x(i),y(v)));
-  ctx.lineTo(x(series.length-1),H-pad);
-  ctx.closePath(); ctx.fill();
-
-  // Line
-  ctx.strokeStyle='#00e676'; ctx.lineWidth=2; ctx.lineJoin='round';
-  ctx.beginPath();
-  series.forEach((v,i)=>i===0?ctx.moveTo(x(i),y(v)):ctx.lineTo(x(i),y(v)));
-  ctx.stroke();
-
-  // Labels
-  ctx.fillStyle='#546e7a'; ctx.font=`${9*window.devicePixelRatio/window.devicePixelRatio}px monospace`;
-  ctx.fillText(maxEq.toFixed(1)+'R', 2, pad+4);
-  ctx.fillText(minEq.toFixed(1)+'R', 2, H-pad+4);
-}
-
-function drawMonthlyChart(trades) {
-  const canvas = document.getElementById('bt-monthly-canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width  = canvas.offsetWidth * window.devicePixelRatio;
-  canvas.height = 120 * window.devicePixelRatio;
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  const W=canvas.offsetWidth, H=120;
-
-  // Group by month
-  const months={};
-  trades.forEach(t=>{ months[t.month]=(months[t.month]||0)+t.rPnl; });
-  const keys=Object.keys(months).sort();
-  if(!keys.length) return;
-
-  const vals=keys.map(k=>months[k]);
-  const maxAbs=Math.max(...vals.map(Math.abs),0.1);
-  const barW=(W-16)/keys.length;
-  const midY=H/2;
-
-  keys.forEach((k,i)=>{
-    const v=vals[i];
-    const bh=Math.abs(v)/maxAbs*(midY-8);
-    const bx=8+i*barW+barW*0.1;
-    const bw=barW*0.8;
-    ctx.fillStyle=v>=0?'rgba(0,230,118,0.7)':'rgba(255,23,68,0.7)';
-    ctx.beginPath();
-    ctx.roundRect(bx, v>=0?midY-bh:midY, bw, bh, 2);
-    ctx.fill();
-  });
-
-  // Zero line
-  ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(8,midY); ctx.lineTo(W-8,midY); ctx.stroke();
-}
-
-// ── Trade list render ──────────────────────────────────────
-function renderTradeList(filter) {
-  btFilter_cur=filter;
-  let trades=btTrades;
-  if(filter==='bull')    trades=trades.filter(t=>t.dir==='BULL');
-  if(filter==='bear')    trades=trades.filter(t=>t.dir==='BEAR');
-  if(filter==='tp')      trades=trades.filter(t=>t.result==='tp');
-  if(filter==='sl')      trades=trades.filter(t=>t.result==='sl');
-  if(filter==='premium') trades=trades.filter(t=>t.isPremium);
-
-  const el=document.getElementById('bt-trade-list');
-  if(!trades.length){ el.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Žádné obchody pro tento filtr.</div>'; return; }
-
-  // Zobraz posledních 100
-  const shown=trades.slice(-100).reverse();
-  el.innerHTML=shown.map(t=>{
-    const dtStr=t.dt.toISOString().slice(0,16).replace('T',' ');
-    const isBull=t.dir==='BULL';
-    const resCls=t.result==='tp'?'tp':t.result==='sl'?'sl':'be';
-    const resLabel=t.result==='tp'?'✓ TP':t.result==='sl'?'✗ SL':'→ BE';
-    return`<div class="bt-trade ${isBull?'bull':'bear'}">
-      <div class="bt-trade-header">
-        <span class="bt-trade-dir ${isBull?'bull':'bear'}">${isBull?'▲ BUY':'▼ SELL'}${t.isPremium?' ★':''}</span>
-        <span class="bt-trade-result ${resCls}">${resLabel} ${t.rPnl>0?'+':''}${t.rPnl}R</span>
-      </div>
-      <div class="bt-trade-meta">
-        <span>${dtStr}</span>
-        <span>SL: ${t.slPips}p</span>
-        <span>Entry: ${t.entry.toFixed(5)}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function btFilter(f, el) {
-  document.querySelectorAll('.bt-filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderTradeList(f);
-}
-
-// ── File loader – multi-file (merge více CSV) ──────────────
-function btLoadFiles(input) {
-  const files = Array.from(input.files);
-  if(!files.length) return;
-  const info = document.getElementById('bt-file-info');
-  info.style.display='block';
-  info.style.color='var(--accent)';
-  info.textContent=`⏳ Načítám ${files.length} souborů...`;
-  btRawCandles = [];
-
-  let loaded = 0;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const parsed = parseHistdataCSV(e.target.result);
-      btRawCandles = btRawCandles.concat(parsed);
-      loaded++;
-      if(loaded === files.length) {
-        // Seřaď a deduplikuj
-        btRawCandles.sort((a,b)=>a.dt-b.dt);
-        // Odstraň duplicity (stejný timestamp)
-        btRawCandles = btRawCandles.filter((c,i)=>
-          i===0 || c.dt.getTime()!==btRawCandles[i-1].dt.getTime()
-        );
-        const from = btRawCandles[0].dt.toISOString().slice(0,10);
-        const to   = btRawCandles[btRawCandles.length-1].dt.toISOString().slice(0,10);
-        info.textContent = `✓ ${files.length} souborů | ${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
-        document.getElementById('bt-run-btn').disabled = false;
-        document.getElementById('bt-drop').querySelector('.bt-upload-label').innerHTML =
-          `<strong style="color:var(--bull)">✓ ${files.length} souborů načteno</strong><br>` +
-          files.map(f=>f.name).join('<br>') +
-          `<br><span style="color:var(--accent)">${btRawCandles.length.toLocaleString()} svíček celkem</span>`;
-      }
-    };
-    reader.readAsText(file);
-  });
-}
-
-// Drag & drop (multi)
-document.getElementById('bt-drop').addEventListener('dragover',e=>{e.preventDefault();e.currentTarget.classList.add('drag');});
-document.getElementById('bt-drop').addEventListener('dragleave',e=>e.currentTarget.classList.remove('drag'));
-document.getElementById('bt-drop').addEventListener('drop',e=>{
-  e.preventDefault(); e.currentTarget.classList.remove('drag');
-  if(!e.dataTransfer.files.length) return;
-  document.getElementById('bt-file').files = e.dataTransfer.files;
-  btLoadFiles(document.getElementById('bt-file'));
-});
-
-
-// ============================================================
-// BACKTEST SAVE & COMPARE
-// ============================================================
-let btSaved = JSON.parse(localStorage.getItem('rimc_bt_saved') || '[]');
-let btLastResult = null; // aktuální výsledek čekající na uložení
-
-function saveBtState() {
-  localStorage.setItem('rimc_bt_saved', JSON.stringify(btSaved.slice(-10)));
-}
-
-function saveBacktest() {
-  if(!btLastResult) return;
-  const name = document.getElementById('bt-run-name').value.trim() ||
-    'Backtest ' + new Date().toLocaleDateString('cs-CZ');
-  btSaved.unshift({ ...btLastResult, name, savedAt: new Date().toISOString() });
-  saveBtState();
-  renderCompareTable();
-  document.getElementById('bt-save-btn').disabled = true;
-  document.getElementById('bt-run-name').value = '';
-  log('💾 Backtest uložen: ' + name, 'info');
-}
-
-function deleteBacktest(idx) {
-  btSaved.splice(idx, 1);
-  saveBtState();
-  renderCompareTable();
-}
-
-function renderCompareTable() {
-  const wrap = document.getElementById('bt-compare-wrap');
-  if(!btSaved.length) {
-    wrap.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Zatím žádné uložené backtesty.</div>';
-    return;
-  }
-
-  // Najdi best hodnoty pro zvýraznění
-  const best = {
-    wr:   Math.max(...btSaved.map(b=>b.wr)),
-    pf:   Math.max(...btSaved.map(b=>b.pf)),
-    netR: Math.max(...btSaved.map(b=>b.netR)),
-    dd:   Math.min(...btSaved.map(b=>b.dd)), // nejmenší DD = nejlepší
-  };
-
-  const rows = btSaved.map((b,i) => {
-    const isBestWR  = b.wr   === best.wr;
-    const isBestPF  = b.pf   === best.pf;
-    const isBestNet = b.netR === best.netR;
-    const isBestDD  = b.dd   === best.dd;
-    return `<tr>
-      <td style="color:var(--text)">${b.name}</td>
-      <td class="${isBestWR?'best':b.wr<50?'worst':''}">${b.wr.toFixed(1)}%</td>
-      <td class="${isBestPF?'best':b.pf<1?'worst':''}">${b.pf.toFixed(2)}</td>
-      <td class="${isBestNet?'best':b.netR<0?'worst':''}">${b.netR>0?'+':''}${b.netR.toFixed(1)}R</td>
-      <td class="${isBestDD?'best':b.dd>10?'worst':''}">${b.dd.toFixed(1)}R</td>
-      <td style="color:var(--text-dim)">${b.total}</td>
-      <td style="color:var(--text-dim)">${b.premWR!==null?b.premWR.toFixed(1)+'%':'–'}</td>
-      <td style="color:var(--text-dim);font-size:9px">${b.params}</td>
-      <td><button class="bt-del-btn" onclick="deleteBacktest(${i})">✕</button></td>
-    </tr>`;
-  }).join('');
-
-  wrap.innerHTML = `<div class="bt-compare-wrap">
-    <table class="bt-compare-table">
-      <thead><tr>
-        <th>Název</th><th>WR%</th><th>PF</th><th>Net R</th>
-        <th>Max DD</th><th>Obchody</th><th>★WR</th><th>Params</th><th></th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>
-  <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:6px">
-    🟢 = nejlepší hodnota | max 10 uložených backtestů
-  </div>`;
-}
-
-// Zavolej po dokončení backttestu – ulož výsledek do btLastResult
-function captureBacktestResult(trades, rrRatio, tfMin, sessFilter, setupFilter, spreadPips=2, slippagePips=0.5, commission=3.5) {
-  const tp    = trades.filter(t=>t.result==='tp').length;
-  const sl    = trades.filter(t=>t.result==='sl').length;
-  const total = tp+sl;
-  const wr    = total>0 ? tp/total*100 : 0;
-  const grossW= trades.filter(t=>t.result==='tp').reduce((a,t)=>a+t.rPnl,0);
-  const grossL= Math.abs(trades.filter(t=>t.result==='sl').reduce((a,t)=>a+t.rPnl,0));
-  const pf    = grossL>0 ? grossW/grossL : 99;
-  const netR  = trades.reduce((a,t)=>a+t.rPnl,0);
-
-  let peak=0,eq=0,dd=0;
-  trades.forEach(t=>{ eq+=t.rPnl; if(eq>peak)peak=eq; dd=Math.max(dd,peak-eq); });
-
-  const premTrades = trades.filter(t=>t.isPremium);
-  const premTP = premTrades.filter(t=>t.result==='tp').length;
-  const premWR = premTrades.length>0 ? premTP/premTrades.length*100 : null;
-
-  const sessLabels = {all:'Vše',london:'London',ny:'NY',both:'LON+NY'};
-  const params = `M${tfMin} RR${rrRatio} ${sessLabels[sessFilter]} Sp${spreadPips}p Slip${slippagePips}p ${setupFilter==='all'?'':setupFilter}`.trim();
-
-  btLastResult = { wr, pf, netR, dd, total, premWR, params,
-    from: trades[0]?.dt.toISOString().slice(0,10) || '–',
-    to:   trades[trades.length-1]?.dt.toISOString().slice(0,10) || '–' };
-
-  document.getElementById('bt-save-btn').disabled = false;
-}
-
-// Init
-renderCompareTable();
-
-
-// ============================================================
-// NAČTENÍ DAT PŘÍMO Z GITHUBU
-// ============================================================
-const GITHUB_BASE = 'https://raw.githubusercontent.com/gogos1976-cmd/RIMC-app/main/';
-const GITHUB_FILES = [
-  'DAT_ASCII_GBPUSD_M1_2023.csv',
-  'DAT_ASCII_GBPUSD_M1_2024.csv',
-  'DAT_ASCII_GBPUSD_M1_2025.csv',
-];
-
-async function loadFromGitHub() {
-  const progWrap  = document.getElementById('bt-github-progress');
-  const progFill  = document.getElementById('bt-gh-fill');
-  const statusEl  = document.getElementById('bt-github-status');
-  const runBtn    = document.getElementById('bt-run-btn');
-
-  progWrap.style.display = 'block';
-  btRawCandles = [];
-
-  for(let i=0; i<GITHUB_FILES.length; i++){
-    const fname = GITHUB_FILES[i];
-    const pct   = Math.round((i/GITHUB_FILES.length)*80);
-    progFill.style.width = pct + '%';
-    statusEl.textContent = `⬇ Načítám ${fname}... (${i+1}/${GITHUB_FILES.length})`;
-
-    try {
-      const res  = await fetch(GITHUB_BASE + fname);
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      const parsed = parseHistdataCSV(text);
-      btRawCandles = btRawCandles.concat(parsed);
-      statusEl.textContent = `✓ ${fname} – ${parsed.length.toLocaleString()} svíček`;
-    } catch(e) {
-      statusEl.textContent = `⚠ Chyba: ${fname} – ${e.message}`;
-      statusEl.style.color = 'var(--bear)';
-      progWrap.style.display = 'none';
-      return;
-    }
-  }
-
-  // Seřaď a deduplikuj
-  btRawCandles.sort((a,b)=>a.dt-b.dt);
-  btRawCandles = btRawCandles.filter((c,i)=>
-    i===0 || c.dt.getTime()!==btRawCandles[i-1].dt.getTime()
-  );
-
-  progFill.style.width = '100%';
-  const from = btRawCandles[0].dt.toISOString().slice(0,10);
-  const to   = btRawCandles[btRawCandles.length-1].dt.toISOString().slice(0,10);
-  statusEl.textContent = `✓ Načteno ${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
-  statusEl.style.color = 'var(--bull)';
-
-  // Update upload zóny
-  document.getElementById('bt-drop').querySelector('.bt-upload-label').innerHTML =
-    `<strong style="color:var(--bull)">✓ GitHub data načtena</strong><br>` +
-    `${btRawCandles.length.toLocaleString()} svíček | ${from} → ${to}`;
-  document.getElementById('bt-file-info').style.display = 'block';
-  document.getElementById('bt-file-info').textContent =
-    `✓ 3 roky GBPUSD M1 dat | ${btRawCandles.length.toLocaleString()} svíček`;
-
-  runBtn.disabled = false;
-  setTimeout(()=>{ progWrap.style.display='none'; }, 2000);
-
-  log(`✓ GitHub data načtena: ${btRawCandles.length.toLocaleString()} svíček (${from}→${to})`, 'info');
-}
-
-
-// Aktualizuj realism info box při změně parametrů
-function updateRealismInfo() {
-  const spread     = parseFloat(document.getElementById('bt-spread')?.value || 2);
-  const slippage   = parseFloat(document.getElementById('bt-slippage')?.value || 0.5);
-  const commission = parseFloat(document.getElementById('bt-commission')?.value || 3.5);
-  const minSL      = parseFloat(document.getElementById('bt-minsl')?.value || 10);
-  const info = document.getElementById('bt-realism-info');
-  const summary = document.getElementById('bt-realism-summary');
-  if(!info || !summary) return;
-  const totalCost = spread + slippage;
-  info.style.display = 'block';
-  summary.innerHTML = `Spread: <span style="color:var(--text)">${spread}p</span> · Slippage: <span style="color:var(--text)">${slippage}p</span> · Komise: <span style="color:var(--text)">$${commission}/lot</span> · Min SL: <span style="color:var(--text)">${minSL}p</span> · Celkem vstupní náklady: <span style="color:var(--accent2)">${totalCost}p</span>`;
-}
-
-// Attach listeners
-['bt-spread','bt-slippage','bt-commission','bt-minsl'].forEach(id => {
-  const el = document.getElementById(id);
-  if(el) el.addEventListener('change', updateRealismInfo);
-});
-updateRealismInfo();
 
 
 // ============================================================
@@ -2806,7 +2119,8 @@ function manageTrade(currentPrice, m5Candles) {
   const t = activeTrade;
   const dir = t.direction;
   const BE_BUFFER = 0.0001; // 1 pip
-  const risk = Math.abs(t.entry - t.sl); // 1R v ceně
+  const risk = Math.abs(t.entry - t.originalSL); // 1R v ceně (fixní od otevření)
+  if(risk < 1e-6) return;
 
   // Výpočet aktuálního R
   const currentR = dir==='BULL'
@@ -2818,16 +2132,17 @@ function manageTrade(currentPrice, m5Candles) {
   // Sleduj Maximum Favorable Excursion
   if(currentR > (t.maxR || 0)) {
     t.maxR = currentR;
-    localStorage.setItem('rimc_active_trade', JSON.stringify(activeTrade));
   }
 
-  // ── FÁZE 2: při 1R → BE + 1 pip ────────────────────────────
-  if(!t.beActivated && currentR >= 1.0) {
+  // ★ Live sync maxR/currentR na propojený alert
+  syncAlertLiveData(t);
+
+  // ── FÁZE 2: při P.beAtR → BE + 1 pip ───────────────────────
+  if(!t.beActivated && currentR >= P.beAtR) {
     const newSL = dir==='BULL'
       ? t.entry + BE_BUFFER
       : t.entry - BE_BUFFER;
 
-    // Posun jen pokud je to lepší než aktuální SL
     if((dir==='BULL' && newSL > t.sl) || (dir==='BEAR' && newSL < t.sl)) {
       t.sl = newSL;
       t.beActivated = true;
@@ -2842,12 +2157,11 @@ function manageTrade(currentPrice, m5Candles) {
   if(!t.partialClosed && currentR >= 2.0) {
     const trendInfo = isAggressiveTrend(m5Candles, dir);
     const closePct  = trendInfo.isAggressive ? 30 : 50;
-    const remainPct = 100 - closePct;
 
     t.partialClosed   = true;
     t.partialClosePct = closePct;
     t.trendInfo       = trendInfo;
-    t.trailingActive  = true; // aktivuj trailing
+    t.trailingActive  = true;
 
     const msg = `📊 ${trendInfo.isAggressive?'AGRESIVNÍ':'STANDARD'} trend (${trendInfo.score}/3) | Partial close ${closePct}% @ 2R | Trailing aktivován`;
     log(msg, trendInfo.isAggressive ? 'bull' : 'info');
@@ -2871,39 +2185,66 @@ function manageTrade(currentPrice, m5Candles) {
     }
   }
 
-  // ── Kontrola SL hitu ───────────────────────────────────────
+  // Save state
+  localStorage.setItem('rimc_active_trade', JSON.stringify(activeTrade));
+
+  // ── Kontrola SL hitu (★ automatické vyhodnocení) ──────────
   if((dir==='BULL' && currentPrice <= t.sl) ||
      (dir==='BEAR' && currentPrice >= t.sl)) {
+    const result = t.beActivated ? 'be' : 'sl';
     const finalR = t.currentR.toFixed(2);
-    log(`❌ SL HIT @ ${currentPrice.toFixed(5)} | Final R: ${finalR}`, 'bear');
-    fireTradeNotification('SL_HIT', t, `SL zasažen @ ${currentPrice.toFixed(5)} | R: ${finalR}`);
-    closeTrade('sl');
+    const maxR   = t.maxR.toFixed(2);
+    log(`${result==='be'?'➡️ BE':'❌ SL'} HIT @ ${currentPrice.toFixed(5)} | Exit R: ${finalR} | Max R: ${maxR}`, result==='be'?'info':'bear');
+    fireTradeNotification('SL_HIT', t, `${result==='be'?'BE':'SL'} @ ${currentPrice.toFixed(5)} | R: ${finalR} | Max: ${maxR}`);
+    closeTrade(result, true);  // ★ isAuto = true
     return;
   }
 
-  // ── Kontrola TP hitu ──────────────────────────────────────
+  // ── Kontrola TP hitu (★ automatické vyhodnocení) ──────────
   if((dir==='BULL' && currentPrice >= t.tp) ||
      (dir==='BEAR' && currentPrice <= t.tp)) {
     const finalR = t.currentR.toFixed(2);
-    log(`✅ TP HIT @ ${currentPrice.toFixed(5)} | Final R: ${finalR}`, 'bull');
-    fireTradeNotification('TP_HIT', t, `TP zasažen @ ${currentPrice.toFixed(5)} | R: ${finalR}`);
-    closeTrade('tp');
+    const maxR   = t.maxR.toFixed(2);
+    log(`✅ TP HIT @ ${currentPrice.toFixed(5)} | Exit R: ${finalR} | Max R: ${maxR}`, 'bull');
+    fireTradeNotification('TP_HIT', t, `TP @ ${currentPrice.toFixed(5)} | R: ${finalR} | Max: ${maxR}`);
+    closeTrade('tp', true);  // ★ isAuto = true
     return;
   }
 
   renderTradeManager();
 }
 
-function openTrade(direction, entry, sl, tp, lot, isPremium) {
+// ★ Průběžně synchronizuje maxR/currentR z activeTrade do alert historie
+function syncAlertLiveData(trade) {
+  if(!trade || !trade.alertId) return;
+  const alert = alertHistory.find(a => a.id === trade.alertId);
+  if(!alert || alert.result) return;  // už vyhodnocený, nesahat
+
+  let changed = false;
+  if(trade.maxR > (alert.maxR || 0)) {
+    alert.maxR = trade.maxR;
+    changed = true;
+  }
+  alert.currentR = trade.currentR;
+
+  // Uložit jen občas (každých 5 updatů) aby se nebombardoval localStorage
+  if(changed) {
+    saveAlerts();
+    renderAlerts();
+  }
+}
+
+function openTrade(direction, entry, sl, tp, lot, isPremium, alertId) {
   activeTrade = {
     direction, entry, sl, tp, lot, isPremium,
+    alertId: alertId || null,   // ★ Přímé propojení s alertem
     originalSL: sl, originalTP: tp,
     beActivated: false,
     partialClosed: false,
     trailingActive: false,
     trailingHistory: [],
     currentR: 0,
-    maxR: 0,        // Maximum Favorable Excursion
+    maxR: 0,
     openTime: new Date().toISOString(),
   };
   localStorage.setItem('rimc_active_trade', JSON.stringify(activeTrade));
@@ -2911,28 +2252,54 @@ function openTrade(direction, entry, sl, tp, lot, isPremium) {
   renderTradeManager();
 }
 
-function closeTrade(result) {
+function closeTrade(result, isAuto) {
   if(!activeTrade) return;
-  // Ulož do alert history jako výsledek + maxR
-  const existing = alertHistory.find(a =>
-    Math.abs(a.entry - activeTrade.entry) < 0.0001 && !a.result
-  );
+
+  // ★ Najdi alert přes alertId (přímé propojení), fallback na fuzzy match
+  let existing = null;
+  if(activeTrade.alertId) {
+    existing = alertHistory.find(a => a.id === activeTrade.alertId);
+  }
+  if(!existing) {
+    existing = alertHistory.find(a =>
+      Math.abs(a.entry - activeTrade.entry) < 0.0001 && !a.result
+    );
+  }
+
   if(existing) {
-    existing.maxR     = activeTrade.maxR || 0;
-    existing.exitR    = activeTrade.currentR || 0;
-    existing.partialPct = activeTrade.partialClosePct || null;
+    existing.maxR        = activeTrade.maxR || 0;
+    existing.exitR       = activeTrade.currentR || 0;
+    existing.partialPct  = activeTrade.partialClosePct || null;
+    existing.autoResolved = !!isAuto;
+
+    // ★ Vypočítej dobu trvání obchodu
+    const openMs  = new Date(activeTrade.openTime).getTime();
+    const closeMs = Date.now();
+    const durMin  = Math.round((closeMs - openMs) / 60000);
+    existing.duration = durMin;
+
     setAlertResult(existing.id, result);
   }
+
   activeTrade = null;
   localStorage.removeItem('rimc_active_trade');
   renderTradeManager();
 }
 
 function fireTradeNotification(type, trade, msg) {
-  // Push notifikace
+  const titles = {
+    BE: '🔒 RIMC BE Aktivován',
+    PARTIAL: '✂ RIMC Partial Close',
+    TRAIL: '📈 RIMC Trailing SL',
+    SL_HIT: '❌ RIMC SL Hit',
+    TP_HIT: '✅ RIMC TP Hit',
+  };
+  // Browser push
   if('Notification' in window && Notification.permission==='granted') {
-    try { new Notification(titles[type]||type, { body:msg, icon:'./icon-192.png', tag:'rimc-trade' }); } catch(e){}
+    try { new Notification(titles[type]||'RIMC', { body:msg, icon:'./icon-192.png', tag:'rimc-trade' }); } catch(e){}
   }
+  // ★ Discord
+  sendDiscordTradeUpdate(type, trade, msg);
 }
 
 // ── Trade Manager UI ─────────────────────────────────────────
@@ -2992,9 +2359,9 @@ function renderTradeManager() {
       </div>`:''}
       ${trailRows?`<div style="margin-top:6px">${trailRows}</div>`:''}
       <div style="display:flex;gap:6px;margin-top:10px">
-        <button class="result-btn" style="flex:1" onclick="closeTrade('tp')">✓ ZAVŘÍT TP</button>
-        <button class="result-btn" style="flex:1" onclick="closeTrade('sl')">✗ ZAVŘÍT SL</button>
-        <button class="result-btn" style="flex:1" onclick="closeTrade('be')">→ ZAVŘÍT BE</button>
+        <button class="result-btn" style="flex:1" onclick="closeTrade('tp', false)">✓ ZAVŘÍT TP</button>
+        <button class="result-btn" style="flex:1" onclick="closeTrade('sl', false)">✗ ZAVŘÍT SL</button>
+        <button class="result-btn" style="flex:1" onclick="closeTrade('be', false)">→ ZAVŘÍT BE</button>
       </div>
     </div>`;
 }

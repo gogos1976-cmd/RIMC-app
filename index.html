@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RIMC">
+<meta name="theme-color" content="#080c10">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>RIMC · GBPUSD</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c10;
+  --bg2: #0d1318;
+  --bg3: #131c24;
+  --border: #1e2d3d;
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --bull: #00e676;
+  --bear: #ff1744;
+  --neutral: #78909c;
+  --text: #cfd8dc;
+  --text-dim: #546e7a;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Syne', sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* GRID BG */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events:none; z-index:0;
+}
+
+/* LOADING */
+#loading {
+  position:fixed; inset:0;
+  background: var(--bg);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:16px; z-index:999;
+}
+.spinner {
+  width:36px; height:36px;
+  border:2px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.load-text { font-family:var(--mono); font-size:11px; color:var(--text-dim); letter-spacing:2px; }
+
+/* SCROLL CONTAINER */
+.app {
+  position:relative; z-index:1;
+  max-width:480px;
+  margin:0 auto;
+  padding:0 0 80px 0;
+  min-height:100vh;
+}
+
+/* TOP BAR */
+.topbar {
+  position:sticky; top:0; z-index:100;
+  background: rgba(8,12,16,0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.topbar-left h1 {
+  font-size:18px; font-weight:800; color:#fff; letter-spacing:-0.3px;
+}
+.topbar-left h1 span { color:var(--accent); }
+.topbar-left p {
+  font-family:var(--mono); font-size:9px; color:var(--text-dim);
+  letter-spacing:2px; text-transform:uppercase; margin-top:2px;
+}
+.topbar-right { display:flex; align-items:center; gap:10px; }
+.live-dot-wrap {
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--mono); font-size:10px; color:var(--bull);
+}
+.live-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--bull);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+.refresh-btn {
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--accent); font-family:var(--mono); font-size:12px;
+  padding:6px 12px; border-radius:4px; cursor:pointer;
+  transition:all .2s; -webkit-appearance:none;
+}
+.refresh-btn:active { background:rgba(0,229,255,0.1); }
+
+/* SECTIONS */
+.section { padding:12px 16px; }
+.section-title {
+  font-family:var(--mono); font-size:9px; letter-spacing:3px;
+  color:var(--text-dim); text-transform:uppercase; margin-bottom:10px;
+}
+
+/* PRICE CARD */
+.price-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:16px;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:12px;
+}
+.price-main {
+  font-family:var(--mono); font-size:34px; font-weight:700;
+  color:#fff; letter-spacing:-1px;
+}
+.price-change {
+  font-family:var(--mono); font-size:12px;
+  padding:4px 10px; border-radius:4px;
+}
+.price-change.up { background:rgba(0,230,118,.1); color:var(--bull); }
+.price-change.down { background:rgba(255,23,68,.1); color:var(--bear); }
+.price-stats {
+  width:100%; display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  padding-top:12px; border-top:1px solid var(--border);
+}
+.ps { display:flex; flex-direction:column; gap:2px; }
+.ps label { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; }
+.ps value { font-family:var(--mono); font-size:12px; }
+
+/* RIMC PHASES */
+.phases {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+}
+.phase {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:14px;
+  position:relative; overflow:hidden;
+  transition: border-color .3s;
+}
+.phase::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:2px;
+  background:transparent; transition:background .3s;
+}
+.phase.bull-active { border-color:rgba(0,230,118,.5); }
+.phase.bull-active::before { background:var(--bull); }
+.phase.bear-active { border-color:rgba(255,23,68,.5); }
+.phase.bear-active::before { background:var(--bear); }
+.phase.info-active { border-color:rgba(0,229,255,.5); }
+.phase.info-active::before { background:var(--accent); }
+
+.phase-num {
+  font-family:var(--mono); font-size:9px; color:var(--text-dim);
+  letter-spacing:2px; margin-bottom:4px;
+}
+.phase-name {
+  font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;
+}
+.phase-badge {
+  display:inline-block; font-family:var(--mono); font-size:9px;
+  padding:3px 8px; border-radius:3px; letter-spacing:1px;
+  margin-bottom:6px;
+}
+.pb-wait { background:rgba(84,110,122,.12); color:var(--neutral); }
+.pb-bull { background:rgba(0,230,118,.12); color:var(--bull); }
+.pb-bear { background:rgba(255,23,68,.12); color:var(--bear); }
+.pb-info { background:rgba(0,229,255,.12); color:var(--accent); }
+.phase-detail { font-family:var(--mono); font-size:9px; color:var(--text-dim); line-height:1.5; }
+
+/* SIGNAL CARD */
+.signal-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:16px;
+  transition: border-color .3s, background .3s;
+}
+.signal-card.bullish { border-color:rgba(0,230,118,.4); background:rgba(0,230,118,.03); }
+.signal-card.bearish { border-color:rgba(255,23,68,.4); background:rgba(255,23,68,.03); }
+.sig-dir {
+  font-size:38px; font-weight:800; letter-spacing:-1px;
+  margin-bottom:4px;
+}
+.sig-dir.bull { color:var(--bull); }
+.sig-dir.bear { color:var(--bear); }
+.sig-dir.neutral { color:var(--neutral); }
+.sig-conf { font-family:var(--mono); font-size:11px; color:var(--text-dim); margin-bottom:10px; }
+.conf-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:14px; }
+.conf-fill { height:100%; border-radius:2px; transition:width .8s ease; }
+.cf-bull { background:linear-gradient(90deg,var(--bull),#69f0ae); }
+.cf-bear { background:linear-gradient(90deg,var(--bear),#ff5252); }
+.cf-neutral { background:var(--neutral); }
+.sig-levels {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;
+}
+.sig-level label { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; display:block; margin-bottom:3px; }
+.sig-level value { font-family:var(--mono); font-size:13px; font-weight:700; }
+.sl-entry value { color:var(--accent); }
+.sl-tp value { color:var(--bull); }
+.sl-sl value { color:var(--bear); }
+
+/* TF TABS */
+.tf-tabs { display:flex; gap:6px; margin-bottom:10px; }
+.tf-tab {
+  flex:1; padding:8px; text-align:center;
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:6px; font-family:var(--mono); font-size:11px;
+  color:var(--text-dim); cursor:pointer; transition:all .2s;
+  font-weight:700;
+}
+.tf-tab.active {
+  background:rgba(0,229,255,.08);
+  border-color:var(--accent); color:var(--accent);
+}
+.tf-panel { display:none; }
+.tf-panel.active { display:block; }
+.tf-badge {
+  display:inline-block; font-family:var(--mono); font-size:10px;
+  padding:3px 10px; border-radius:3px; margin-bottom:10px; letter-spacing:1px;
+}
+.tf-badge.bull { background:rgba(0,230,118,.12); color:var(--bull); }
+.tf-badge.bear { background:rgba(255,23,68,.12); color:var(--bear); }
+.tf-badge.neutral { background:rgba(84,110,122,.12); color:var(--neutral); }
+.ind-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:8px 10px; background:var(--bg3); border-radius:4px; margin-bottom:6px;
+}
+.ind-name { font-family:var(--mono); font-size:11px; color:var(--text-dim); }
+.ind-val { font-family:var(--mono); font-size:11px; font-weight:700; }
+.iv-bull { color:var(--bull); }
+.iv-bear { color:var(--bear); }
+.iv-neutral { color:var(--neutral); }
+
+/* ZONES */
+.zone-item {
+  background:var(--bg3); border-radius:6px; padding:10px 12px;
+  margin-bottom:6px; display:flex; align-items:center; gap:10px;
+}
+.zt {
+  font-family:var(--mono); font-size:9px; padding:3px 7px;
+  border-radius:3px; letter-spacing:1px; min-width:68px; text-align:center;
+}
+.zt-bull { background:rgba(0,230,118,.1); color:var(--bull); }
+.zt-bear { background:rgba(255,23,68,.1); color:var(--bear); }
+.zt-bos { background:rgba(0,229,255,.1); color:var(--accent); }
+.zt-range { background:rgba(255,107,53,.1); color:var(--accent2); }
+.zone-info { flex:1; }
+.zone-range { font-family:var(--mono); font-size:11px; color:var(--text); }
+.zone-meta { font-family:var(--mono); font-size:9px; color:var(--text-dim); margin-top:2px; }
+.zone-in { font-family:var(--mono); font-size:10px; color:var(--accent2); }
+
+/* LOG */
+.log-item {
+  display:flex; gap:10px; padding:8px 10px;
+  background:var(--bg3); border-radius:4px; margin-bottom:5px;
+  border-left:3px solid transparent;
+  font-family:var(--mono); font-size:10px;
+}
+.log-item.bull { border-color:var(--bull); }
+.log-item.bear { border-color:var(--bear); }
+.log-item.info { border-color:var(--accent); }
+.log-time { color:var(--text-dim); min-width:50px; }
+.log-msg { color:var(--text); line-height:1.5; }
+
+/* API NOTICE */
+.api-notice {
+  background:rgba(255,107,53,.08); border:1px solid rgba(255,107,53,.25);
+  border-radius:6px; padding:10px 14px; margin:0 16px 8px;
+  font-family:var(--mono); font-size:10px; color:var(--accent2);
+  display:none; line-height:1.6;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position:fixed; bottom:0; left:0; right:0;
+  background:rgba(8,12,16,.95);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  padding:8px 0;
+  padding-bottom:calc(8px + var(--safe-bottom));
+  display:flex; z-index:100;
+}
+.nav-btn {
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:6px; cursor:pointer; transition:color .2s;
+  font-family:var(--mono); font-size:9px; letter-spacing:1px;
+  color:var(--text-dim); border:none; background:none;
+}
+.nav-btn.active { color:var(--accent); }
+.nav-btn svg { width:20px; height:20px; }
+
+/* PAGES */
+.page { display:none; }
+.page.active { display:block; }
+
+/* INSTALL BANNER */
+#install-banner {
+  margin:0 16px 0; padding:12px 14px;
+  background:rgba(0,229,255,.06); border:1px solid rgba(0,229,255,.2);
+  border-radius:8px; display:none;
+  align-items:center; gap:12px;
+}
+#install-banner p { font-family:var(--mono); font-size:10px; color:var(--text); flex:1; line-height:1.5; }
+#install-banner button {
+  background:var(--accent); color:#000; border:none;
+  font-family:var(--mono); font-size:10px; padding:7px 12px;
+  border-radius:4px; cursor:pointer; font-weight:700;
+  white-space:nowrap;
+}
+
+/* CONFIG PAGE */
+.config-form { padding:0 16px; }
+.config-row { margin-bottom:16px; }
+.config-row label {
+  display:block; font-family:var(--mono); font-size:10px;
+  color:var(--text-dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px;
+}
+.config-row input {
+  width:100%; background:var(--bg3); border:1px solid var(--border);
+  color:var(--text); font-family:var(--mono); font-size:12px;
+  padding:10px 12px; border-radius:6px; outline:none;
+  -webkit-appearance:none;
+}
+.config-row input:focus { border-color:var(--accent); }
+.config-row select {
+  width:100%; background:var(--bg3); border:1px solid var(--border);
+  color:var(--text); font-family:var(--mono); font-size:12px;
+  padding:10px 12px; border-radius:6px; outline:none;
+  -webkit-appearance:none; appearance:none;
+}
+.save-btn {
+  width:100%; background:var(--accent); color:#000;
+  border:none; font-family:var(--mono); font-size:12px;
+  font-weight:700; padding:12px; border-radius:6px; cursor:pointer;
+  letter-spacing:1px; margin-top:8px;
+}
+.save-btn:active { opacity:.8; }
+.config-note {
+  font-family:var(--mono); font-size:10px; color:var(--text-dim);
+  line-height:1.6; padding:12px; background:var(--bg3);
+  border-radius:6px; margin-bottom:16px;
+}
+
+/* RISK CARD */
+.risk-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:16px; margin-bottom:10px;
+}
+.risk-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+.risk-stat { display:flex; flex-direction:column; gap:3px; }
+.risk-stat label { font-family:var(--mono); font-size:9px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; }
+.risk-stat value { font-family:var(--mono); font-size:16px; font-weight:700; color:#fff; }
+.risk-stat value span { font-size:11px; color:var(--text-dim); }
+.lot-badge {
+  display:inline-block; font-family:var(--mono); font-size:22px; font-weight:700;
+  color:var(--accent); padding:10px 0 4px;
+}
+
+/* ALERT HISTORY */
+.alert-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:14px; margin-bottom:8px;
+  border-left:4px solid transparent;
+}
+.alert-card.bull { border-left-color:var(--bull); }
+.alert-card.bear { border-left-color:var(--bear); }
+.alert-card.expired { opacity:0.45; }
+.alert-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.alert-dir { font-family:var(--mono); font-size:13px; font-weight:700; }
+.alert-dir.bull { color:var(--bull); }
+.alert-dir.bear { color:var(--bear); }
+.alert-time { font-family:var(--mono); font-size:10px; color:var(--text-dim); }
+.alert-levels { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
+.alert-lev label { font-family:var(--mono); font-size:9px; color:var(--text-dim); display:block; }
+.alert-lev value { font-family:var(--mono); font-size:11px; font-weight:700; }
+.alert-result-row { display:flex; gap:6px; flex-wrap:wrap; }
+.result-btn {
+  flex:1; min-width:60px; padding:6px 4px; text-align:center;
+  font-family:var(--mono); font-size:10px; border-radius:4px;
+  border:1px solid var(--border); background:var(--bg3);
+  color:var(--text-dim); cursor:pointer; transition:all .2s;
+}
+.result-btn.active-tp { background:rgba(0,230,118,.15); border-color:var(--bull); color:var(--bull); }
+.result-btn.active-sl { background:rgba(255,23,68,.15); border-color:var(--bear); color:var(--bear); }
+.result-btn.active-be { background:rgba(0,229,255,.15); border-color:var(--accent); color:var(--accent); }
+.result-btn.active-skip { background:rgba(84,110,122,.15); border-color:var(--neutral); color:var(--neutral); }
+
+/* STATS PAGE */
+.stat-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 14px; background:var(--bg3); border-radius:6px; margin-bottom:6px;
+}
+.stat-label { font-family:var(--mono); font-size:11px; color:var(--text-dim); }
+.stat-value { font-family:var(--mono); font-size:13px; font-weight:700; }
+.stat-value.pos { color:var(--bull); }
+.stat-value.neg { color:var(--bear); }
+.stat-value.neu { color:var(--accent); }
+.big-stat { text-align:center; padding:16px; background:var(--bg3); border-radius:8px; margin-bottom:8px; }
+.big-stat-val { font-family:var(--mono); font-size:32px; font-weight:700; margin-bottom:4px; }
+.big-stat-label { font-family:var(--mono); font-size:10px; color:var(--text-dim); letter-spacing:2px; }
+.zone-counter {
+  background:rgba(255,107,53,.08); border:1px solid rgba(255,107,53,.2);
+  border-radius:6px; padding:10px 14px; margin-bottom:8px;
+  font-family:var(--mono); font-size:11px; color:var(--accent2);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.reset-btn {
+  background:rgba(255,23,68,.1); border:1px solid rgba(255,23,68,.3);
+  color:var(--bear); font-family:var(--mono); font-size:10px;
+  padding:5px 10px; border-radius:4px; cursor:pointer;
+}
+
+.bt-name-input {
+  background:var(--bg3); border:1px solid var(--border);
+  color:var(--text); font-family:var(--mono); font-size:11px;
+  padding:7px 10px; border-radius:5px; outline:none; width:100%;
+  margin-bottom:8px;
+}
+
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="load-text">NAČÍTÁM RIMC...</div>
+</div>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>R.I.M.C. <span>GBP/USD</span></h1>
+      <p id="last-update">–</p>
+    </div>
+    <div class="topbar-right">
+      <div class="live-dot-wrap"><div class="live-dot"></div>LIVE</div>
+      <button class="refresh-btn" onclick="fetchAndAnalyze()">↻</button>
+    </div>
+  </div>
+
+  <!-- INSTALL BANNER -->
+  <div id="install-banner">
+    <p>📱 Přidat RIMC na plochu telefonu</p>
+    <button onclick="installApp()">INSTALOVAT</button>
+  </div>
+
+  <!-- API NOTICE -->
+  <div id="api-notice" class="api-notice">
+    ⚠ DEMO MODE – zadej API klíč v Nastavení
+  </div>
+
+  <!-- PAGE: DASHBOARD -->
+  <div class="page active" id="page-dash">
+
+    <!-- PRICE -->
+    <div class="section">
+      <div class="price-card">
+        <div>
+          <div class="price-main" id="cur-price">–</div>
+          <div class="price-change up" id="price-chg">–</div>
+        </div>
+        <div class="price-stats">
+          <div class="ps"><label>HIGH</label><value id="p-high" style="color:var(--bull)">–</value></div>
+          <div class="ps"><label>LOW</label><value id="p-low" style="color:var(--bear)">–</value></div>
+          <div class="ps"><label>ATR</label><value id="p-atr">–</value></div>
+          <div class="ps"><label>TREND</label><value id="p-trend">–</value></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGNAL -->
+    <div class="section">
+      <div class="section-title">RIMC Signál</div>
+      <div class="signal-card" id="sig-card">
+        <div class="sig-dir neutral" id="sig-dir">ČEKÁM</div>
+        <div class="sig-conf" id="sig-conf">Spolehlivost: –</div>
+        <div class="conf-bar"><div class="conf-fill cf-neutral" id="sig-bar" style="width:0%"></div></div>
+        <div class="sig-levels">
+          <div class="sig-level sl-entry"><label>ENTRY</label><value id="sig-entry">–</value></div>
+          <div class="sig-level sl-tp"><label>TP</label><value id="sig-tp">–</value></div>
+          <div class="sig-level sl-sl"><label>SL</label><value id="sig-sl">–</value></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRADE MANAGER -->
+    <div class="section">
+      <div class="section-title">Aktivní obchod</div>
+      <div id="trade-manager"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:8px">Žádný aktivní obchod.</div></div>
+    </div>
+
+    <!-- PHASES -->
+    <div class="section">
+      <div class="section-title">Fáze strategie</div>
+      <div class="phases">
+        <div class="phase" id="ph-range">
+          <div class="phase-num">FÁZE 1</div>
+          <div class="phase-name">RANGE</div>
+          <div class="phase-badge pb-wait" id="pb-range">⏳ ČEKÁM</div>
+          <div class="phase-detail" id="pd-range">Analyzuji H1...</div>
+        </div>
+        <div class="phase" id="ph-init">
+          <div class="phase-num">FÁZE 2</div>
+          <div class="phase-name">INITIATION</div>
+          <div class="phase-badge pb-wait" id="pb-init">⏳ ČEKÁM</div>
+          <div class="phase-detail" id="pd-init">BOS/MSB M15...</div>
+        </div>
+        <div class="phase" id="ph-mit">
+          <div class="phase-num">FÁZE 3</div>
+          <div class="phase-name">MITIGATION</div>
+          <div class="phase-badge pb-wait" id="pb-mit">⏳ ČEKÁM</div>
+          <div class="phase-detail" id="pd-mit">FVG M5...</div>
+        </div>
+        <div class="phase" id="ph-cont">
+          <div class="phase-num">FÁZE 4</div>
+          <div class="phase-name">CONTINUATION</div>
+          <div class="phase-badge pb-wait" id="pb-cont">⏳ ČEKÁM</div>
+          <div class="phase-detail" id="pd-cont">Multi-faktor...</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-dash -->
+
+  <!-- PAGE: ANALÝZA -->
+  <div class="page" id="page-analysis">
+
+    <!-- TF TABS -->
+    <div class="section">
+      <div class="section-title">Timeframe analýza</div>
+      <div class="tf-tabs">
+        <div class="tf-tab active" onclick="switchTF('h1',this)">H1</div>
+        <div class="tf-tab" onclick="switchTF('m15',this)">M15</div>
+        <div class="tf-tab" onclick="switchTF('m5',this)">M5</div>
+      </div>
+      <div class="tf-panel active" id="tf-h1">
+        <div class="tf-badge neutral" id="badge-h1">–</div>
+        <div id="ind-h1"></div>
+      </div>
+      <div class="tf-panel" id="tf-m15">
+        <div class="tf-badge neutral" id="badge-m15">–</div>
+        <div id="ind-m15"></div>
+      </div>
+      <div class="tf-panel" id="tf-m5">
+        <div class="tf-badge neutral" id="badge-m5">–</div>
+        <div id="ind-m5"></div>
+      </div>
+    </div>
+
+    <!-- ZONES -->
+    <div class="section">
+      <div class="section-title">Strukturální zóny</div>
+      <div id="zones-list"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Načítám...</div></div>
+    </div>
+
+  </div><!-- /page-analysis -->
+
+  <!-- PAGE: LOG -->
+  <div class="page" id="page-log">
+    <div class="section">
+      <div class="section-title">Alert log</div>
+      <div id="log-list"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: ALERTY -->
+  <div class="page" id="page-alerts">
+    <div class="section">
+      <div class="section-title">Alerty &amp; výsledky</div>
+      <div id="session-alert-counter" class="zone-counter" style="display:none"></div>
+      <div id="alerts-list"><div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:8px">Zatím žádné alerty v této session.</div></div>
+    </div>
+  </div>
+
+  <!-- PAGE: STATISTIKY -->
+  <div class="page" id="page-stats">
+    <div class="section">
+      <div class="section-title">Statistiky</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div class="big-stat">
+          <div class="big-stat-val" id="stat-wr" style="color:var(--bull)">–</div>
+          <div class="big-stat-label">WIN RATE</div>
+        </div>
+        <div class="big-stat">
+          <div class="big-stat-val" id="stat-rr" style="color:var(--accent)">–</div>
+          <div class="big-stat-label">AVG R:R</div>
+        </div>
+      </div>
+      <div id="stats-rows"></div>
+      <button class="reset-btn" style="width:100%;margin-top:12px" onclick="resetStats()">RESETOVAT STATISTIKY</button>
+    </div>
+  </div>
+
+  <!-- PAGE: NASTAVENÍ -->
+  <div class="page" id="page-settings">
+    <div class="section"><div class="section-title">Nastavení</div></div>
+    <div class="config-form">
+      <div class="config-note">
+        Pro live data se zaregistruj zdarma na <strong style="color:var(--accent)">twelvedata.com</strong> a vlož API klíč. Bez klíče běží DEMO mód.
+      </div>
+      <div class="config-note" style="border-color:rgba(0,229,255,.3);color:var(--accent)">
+        ★ Backtest v6: IS 2024 PF=1.51 N=290 | OOS 2023 PF=1.62 N=254 | BE@0.8R | RR 1.5:1
+      </div>
+      <div class="config-row">
+        <label>API Klíč (Twelve Data)</label>
+        <input type="text" id="cfg-apikey" placeholder="Vlož svůj API klíč..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="config-row">
+        <label>Interval obnovy</label>
+        <select id="cfg-interval">
+          <option value="30000">30 sekund</option>
+          <option value="60000">1 minuta</option>
+          <option value="120000">2 minuty</option>
+          <option value="300000" selected>5 minut</option>
+        </select>
+      </div>
+      <div style="height:1px;background:var(--border);margin:16px 0"></div>
+      <div class="section-title" style="margin-bottom:12px">Risk Management</div>
+      <div class="config-row">
+        <label>Velikost účtu (USD)</label>
+        <input type="number" id="cfg-balance" placeholder="10000" min="100" step="100">
+      </div>
+      <div class="config-row">
+        <label>Risk na obchod (%)</label>
+        <input type="number" id="cfg-risk" placeholder="0.25" min="0.1" max="5" step="0.05">
+      </div>
+      <div style="height:1px;background:var(--border);margin:16px 0"></div>
+      <div class="section-title" style="margin-bottom:12px">Discord notifikace</div>
+      <div class="config-note" style="border-color:rgba(88,101,242,.3);color:#7289da">
+        🎮 Kanál → Nastavení → Integrace → Webhooks → Nový webhook → zkopíruj URL. Notifikace přijdou i při zamčeném PC.
+      </div>
+      <div class="config-row">
+        <label>Discord Webhook URL</label>
+        <input type="text" id="cfg-discord" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false">
+      </div>
+      <div class="config-row">
+        <button class="save-btn" style="background:#5865F2;margin-top:0" onclick="testDiscord()">🧪 OTESTOVAT DISCORD</button>
+      </div>
+      <div style="height:1px;background:var(--border);margin:16px 0"></div>
+      <div class="section-title" style="margin-bottom:12px">Alert limity</div>
+      <div class="config-row">
+        <label>Max alertů ze stejné zóny</label>
+        <select id="cfg-zone-alerts">
+          <option value="1">1× (nejpřísnější)</option>
+          <option value="2" selected>2×</option>
+          <option value="3">3×</option>
+          <option value="5">5× (bez limitu)</option>
+        </select>
+      </div>
+      <div class="config-row">
+        <label>Max alertů za session (London/NY)</label>
+        <select id="cfg-session-alerts">
+          <option value="2">2×</option>
+          <option value="3" selected>3×</option>
+          <option value="5">5×</option>
+          <option value="99">Bez limitu</option>
+        </select>
+      </div>
+      <button class="save-btn" onclick="saveConfig()">ULOŽIT A OBNOVIT</button>
+    </div>
+  </div>
+
+
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-dash" onclick="switchPage('dash')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    DASH
+  </button>
+  <button class="nav-btn" id="nav-analysis" onclick="switchPage('analysis')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    ANALÝZA
+  </button>
+  <button class="nav-btn" id="nav-alerts" onclick="switchPage('alerts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    ALERTY
+  </button>
+  <button class="nav-btn" id="nav-log" onclick="switchPage('log')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    LOG
+  </button>
+<button class="nav-btn" id="nav-stats" onclick="switchPage('stats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    STATS
+  </button>
+  <button class="nav-btn" id="nav-settings" onclick="switchPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    SETT
+  </button>
+</nav>
+
+<script>
+// ============================================================
+// CONFIG + RISK MANAGEMENT
+// ============================================================
+const LS = key => localStorage.getItem('rimc_' + key);
+const LSset = (key, val) => localStorage.setItem('rimc_' + key, val);
+
+let CONFIG = {
+  apiKey:        LS('apikey') || '',
+  interval:      parseInt(LS('interval') || '300000'),
+  symbol:        'GBP/USD',
+  balance:       parseFloat(LS('balance') || '10000'),
+  riskPct:       parseFloat(LS('risk') || '0.25'),
+  zoneAlerts:    parseInt(LS('zone_alerts') || '2'),
+  sessionAlerts: parseInt(LS('session_alerts') || '3'),
+  discordWebhook: LS('discord') || '',
+};
+let refreshTimer = null;
+
+// ── Risk & Lot Size Calculator ─────────────────────────────
+// GBPUSD: 1 lot = 100,000 units, pip value ≈ $10 (USD account)
+// Lot = RiskAmount / (SL_pips × pip_value_per_lot)
+function calcLotSize(entryPrice, slPrice) {
+  const riskAmount  = CONFIG.balance * (CONFIG.riskPct / 100);
+  const slPips      = Math.abs(entryPrice - slPrice) * 10000;
+  const pipValuePerLot = 10; // GBPUSD, USD account
+  if(slPips <= 0) return 0.01;
+  const rawLot = riskAmount / (slPips * pipValuePerLot);
+  // Zaokrouhli na standardní loty (0.01)
+  const lot = Math.max(0.01, Math.round(rawLot * 100) / 100);
+  return lot;
+}
+
+function saveConfig() {
+  CONFIG.apiKey        = document.getElementById('cfg-apikey').value.trim();
+  CONFIG.interval      = parseInt(document.getElementById('cfg-interval').value);
+  CONFIG.balance       = parseFloat(document.getElementById('cfg-balance').value) || 10000;
+  CONFIG.riskPct       = parseFloat(document.getElementById('cfg-risk').value) || 0.25;
+  CONFIG.zoneAlerts    = parseInt(document.getElementById('cfg-zone-alerts').value);
+  CONFIG.sessionAlerts = parseInt(document.getElementById('cfg-session-alerts').value);
+  CONFIG.discordWebhook = document.getElementById('cfg-discord').value.trim();
+  LSset('apikey', CONFIG.apiKey);
+  LSset('interval', CONFIG.interval);
+  LSset('balance', CONFIG.balance);
+  LSset('risk', CONFIG.riskPct);
+  LSset('zone_alerts', CONFIG.zoneAlerts);
+  LSset('session_alerts', CONFIG.sessionAlerts);
+  LSset('discord', CONFIG.discordWebhook);
+  startAutoRefresh();
+  fetchAndAnalyze();
+  switchPage('dash');
+}
+
+function loadConfigUI() {
+  document.getElementById('cfg-apikey').value    = CONFIG.apiKey;
+  document.getElementById('cfg-interval').value  = CONFIG.interval;
+  document.getElementById('cfg-balance').value   = CONFIG.balance;
+  document.getElementById('cfg-risk').value      = CONFIG.riskPct;
+  document.getElementById('cfg-zone-alerts').value    = CONFIG.zoneAlerts;
+  document.getElementById('cfg-session-alerts').value = CONFIG.sessionAlerts;
+  document.getElementById('cfg-discord').value   = CONFIG.discordWebhook;
+}
+
+// ============================================================
+// ALERT STATE MANAGEMENT
+// ============================================================
+// Každý alert má: id, direction, entry, tp, sl, lot, strength,
+//                 zone (hash), session, time, result (null/tp/sl/be/skip)
+let alertHistory  = JSON.parse(LS('alerts') || '[]');
+let sessionCounts = JSON.parse(LS('session_counts') || '{}'); // {sessionKey: count}
+let zoneCounts    = JSON.parse(LS('zone_counts') || '{}');    // {zoneKey: count}
+let lastSignalHash = null;
+
+function saveAlerts() {
+  LSset('alerts', JSON.stringify(alertHistory.slice(-200))); // max 200
+  LSset('session_counts', JSON.stringify(sessionCounts));
+  LSset('zone_counts', JSON.stringify(zoneCounts));
+}
+
+function getSessionKey() {
+  const s = getActiveSession();
+  if(!s) return null;
+  const d = new Date();
+  return s.name + '_' + d.toISOString().slice(0,10);
+}
+
+function getZoneKey(entry, sl, direction) {
+  // Zaokrouhli na 3 desetinná místa = 10pip grid
+  const e = Math.round(entry * 1000) / 1000;
+  const s = Math.round(sl * 1000) / 1000;
+  return `${direction}_${e}_${s}`;
+}
+
+function canFireAlert(entry, sl, direction) {
+  const sessKey = getSessionKey();
+  const zoneKey = getZoneKey(entry, sl, direction);
+  if(!sessKey) return { ok:false, reason:'Mimo session' };
+  const sessCount = sessionCounts[sessKey] || 0;
+  const zoneCount = zoneCounts[zoneKey] || 0;
+  if(sessCount >= CONFIG.sessionAlerts)
+    return { ok:false, reason:`Max ${CONFIG.sessionAlerts} alertů za session dosaženo` };
+  if(zoneCount >= CONFIG.zoneAlerts)
+    return { ok:false, reason:`Max ${CONFIG.zoneAlerts} alertů ze stejné zóny dosaženo` };
+  return { ok:true, sessKey, zoneKey, sessCount, zoneCount };
+}
+
+function fireAlert(direction, entry, tp, sl, strength, isPremium) {
+  const check = canFireAlert(entry, sl, direction);
+  if(!check.ok) { log(`🚫 Alert blokován: ${check.reason}`, 'info'); return null; }
+
+  const lot    = calcLotSize(entry, sl);
+  const slPips = Math.abs(entry - sl) * 10000;
+  const tpPips = Math.abs(tp - entry) * 10000;
+  const riskAmt= (CONFIG.balance * CONFIG.riskPct / 100).toFixed(2);
+  const sessName = getActiveSession()?.name || '–';
+  const id = Date.now();
+
+  const alert = {
+    id, direction, entry, tp, sl, lot, strength,
+    isPremium, slPips: slPips.toFixed(1), tpPips: tpPips.toFixed(1),
+    riskAmt, session: sessName, time: new Date().toISOString(),
+    result: null, zoneKey: check.zoneKey, sessKey: check.sessKey,
+    // ── Live tracking fields ──
+    maxR: 0,
+    currentR: 0,
+    exitR: null,
+    partialPct: null,
+    duration: null,
+    autoResolved: false,
+  };
+
+  // Ulož
+  alertHistory.unshift(alert);
+  sessionCounts[check.sessKey] = (sessionCounts[check.sessKey] || 0) + 1;
+  zoneCounts[check.zoneKey]    = (zoneCounts[check.zoneKey] || 0) + 1;
+  saveAlerts();
+
+  // Push notifikace
+  sendPushNotification(alert);
+
+  // Render
+  renderAlerts();
+  renderStats();
+  updateSessionCounter();
+
+  log(`🔔 ALERT ${isPremium?'★ PREMIUM':'STANDARD'} ${direction} | Lot: ${lot} | SL: ${slPips.toFixed(0)}p | Risk: $${riskAmt}`, direction==='BULL'?'bull':'bear');
+
+  return id;  // ★ Vrátí alertId pro propojení s trade managerem
+}
+
+function setAlertResult(id, result) {
+  const alert = alertHistory.find(a=>a.id===id);
+  if(!alert || alert.result) return; // nelze přepsat
+  alert.result = result;
+  // Pokud TP/SL/BE hit → zóna se mění, resetuj zone count
+  if(result === 'tp' || result === 'sl' || result === 'be') {
+    zoneCounts[alert.zoneKey] = 0; // zóna je vyhodnocena, nová zóna může alerty znovu
+  }
+  saveAlerts();
+  renderAlerts();
+  renderStats();
+}
+
+function renderAlerts() {
+  const el = document.getElementById('alerts-list');
+  const todayAlerts = alertHistory.filter(a => {
+    return new Date(a.time).toDateString() === new Date().toDateString();
+  });
+  if(!todayAlerts.length) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:8px">Zatím žádné alerty dnes.</div>';
+    return;
+  }
+  el.innerHTML = todayAlerts.map(a => {
+    const isBull = a.direction==='BULL';
+    const resolved = a.result !== null;
+    const fmt5 = n => (+n).toFixed(5);
+    const timeStr = new Date(a.time).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'});
+
+    // ★ Duration formát
+    let durStr = '';
+    if(a.duration != null) {
+      const h = Math.floor(a.duration / 60);
+      const m = a.duration % 60;
+      durStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+
+    // ★ Live R zobrazení (pro aktivní alerty)
+    const liveR = (!resolved && a.currentR != null)
+      ? `<span style="color:${a.currentR>=0?'var(--bull)':'var(--bear)'}">${a.currentR>=0?'+':''}${a.currentR.toFixed(2)}R</span>`
+      : '';
+
+    // Výsledek badge
+    const resultBadge = resolved
+      ? `<span style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:3px;letter-spacing:1px;${
+          a.result==='tp'?'background:rgba(0,230,118,.15);color:var(--bull)':
+          a.result==='sl'?'background:rgba(255,23,68,.15);color:var(--bear)':
+          a.result==='be'?'background:rgba(0,229,255,.15);color:var(--accent)':
+          'background:rgba(84,110,122,.15);color:var(--neutral)'
+        }">${
+          a.result==='tp'?'✓ TP HIT':a.result==='sl'?'✗ SL HIT':a.result==='be'?'→ BE':'⊘ SKIP'
+        }${a.autoResolved?' ⚡AUTO':''}</span>`
+      : '';
+
+    // Manuální tlačítka (jen pokud nevyhodnoceno)
+    const resultBtns = resolved ? '' : ['tp','sl','be','skip'].map(r => {
+      const labels = {tp:'✓ TP', sl:'✗ SL', be:'→ BE', skip:'⊘ SKIP'};
+      return `<button class="result-btn" onclick="setAlertResult(${a.id},'${r}')">${labels[r]}</button>`;
+    }).join('');
+
+    return `<div class="alert-card ${isBull?'bull':'bear'} ${resolved?'expired':''}">
+      <div class="alert-header">
+        <div>
+          <span class="alert-dir ${isBull?'bull':'bear'}">${isBull?'▲ BUY':'▼ SELL'}</span>
+          ${a.isPremium?' <span style="color:var(--accent2);font-family:var(--mono);font-size:10px">★ PREMIUM</span>':''}
+          ${resultBadge}
+        </div>
+        <div style="text-align:right">
+          <span class="alert-time">${a.session} · ${timeStr}</span>
+          ${durStr?`<div style="font-family:var(--mono);font-size:9px;color:var(--text-dim)">⏱ ${durStr}</div>`:''}
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:10px">
+        ${a.lot} lot <span style="font-size:12px;color:var(--text-dim)">/ Risk $${a.riskAmt}</span>
+        ${liveR?` <span style="font-size:14px;margin-left:8px">${liveR}</span>`:''}
+      </div>
+      <div class="alert-levels" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div class="alert-lev"><label>ENTRY</label><value style="color:var(--accent)">${fmt5(a.entry)}</value></div>
+        <div class="alert-lev"><label>TP (+${a.tpPips}p)</label><value style="color:var(--bull)">${fmt5(a.tp)}</value></div>
+        <div class="alert-lev"><label>SL (${a.slPips}p)</label><value style="color:var(--bear)">${fmt5(a.sl)}</value></div>
+        <div class="alert-lev"><label>MAX R ↑</label><value style="color:var(--accent2)">${a.maxR!=null&&a.maxR>0?(+a.maxR).toFixed(2)+'R':'–'}</value></div>
+      </div>
+      ${(a.maxR!=null && a.maxR > 0)?`<div style="display:grid;grid-template-columns:1fr 1fr ${a.partialPct?'1fr':''};gap:8px;margin:8px 0;padding:8px;background:var(--bg);border-radius:6px;font-family:var(--mono)">
+        <div><div style="font-size:9px;color:var(--text-dim)">MAX R ↑</div><div style="font-size:15px;font-weight:700;color:var(--bull)">${(+a.maxR).toFixed(2)}R</div></div>
+        <div><div style="font-size:9px;color:var(--text-dim)">EXIT R</div><div style="font-size:15px;font-weight:700;color:${a.exitR!=null?(a.exitR>=0?'var(--bull)':'var(--bear)'):'var(--text)'}">${a.exitR!=null?(+a.exitR).toFixed(2)+'R':'–'}</div></div>
+        ${a.partialPct?`<div><div style="font-size:9px;color:var(--text-dim)">PARTIAL</div><div style="font-size:15px;font-weight:700;color:var(--accent2)">${a.partialPct}%</div></div>`:''}
+      </div>`:''}
+      ${resultBtns?`<div class="alert-result-row">${resultBtns}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderStats() {
+  const all = alertHistory.filter(a=>a.result && a.result!=='skip');
+  const tp  = all.filter(a=>a.result==='tp').length;
+  const sl  = all.filter(a=>a.result==='sl').length;
+  const be  = all.filter(a=>a.result==='be').length;
+  const total = tp+sl+be;
+  const wr  = total>0 ? Math.round(((tp+be)/total)*100) : null;
+
+  document.getElementById('stat-wr').textContent = wr!==null ? wr+'%' : '–';
+  document.getElementById('stat-wr').style.color = wr>=50?'var(--bull)':'var(--bear)';
+
+  // ★ Použij reálné exitR z trade manageru (pokud je k dispozici)
+  let rSum = 0;
+  all.forEach(a => {
+    if(a.exitR != null) {
+      rSum += a.exitR;
+    } else {
+      // Fallback na odhad: TP=R:R, SL=-1R, BE=0R
+      if(a.result==='tp') rSum += P.rrRatio;
+      else if(a.result==='sl') rSum += -1;
+      // be = 0
+    }
+  });
+  const rAvg = total>0 ? (rSum/total).toFixed(2) : null;
+  document.getElementById('stat-rr').textContent = rAvg!==null ? rAvg+'R' : '–';
+  document.getElementById('stat-rr').style.color = rAvg>=0?'var(--bull)':'var(--bear)';
+
+  // ★ Avg maxR
+  const withMaxR = all.filter(a => a.maxR != null && a.maxR > 0);
+  const avgMaxR = withMaxR.length > 0
+    ? (withMaxR.reduce((s,a) => s + a.maxR, 0) / withMaxR.length).toFixed(2)
+    : null;
+
+  const premAll  = alertHistory.filter(a=>a.isPremium&&a.result&&a.result!=='skip');
+  const premTP   = premAll.filter(a=>a.result==='tp').length;
+  const premWR   = premAll.length>0 ? Math.round((premTP+premAll.filter(a=>a.result==='be').length)/premAll.length*100) : null;
+
+  const rows = [
+    {l:'Celkem alertů dnes', v: alertHistory.filter(a=>new Date(a.time).toDateString()===new Date().toDateString()).length, cls:'neu'},
+    {l:'Vyhodnocených', v:`${total} (TP:${tp} SL:${sl} BE:${be})`, cls:'neu'},
+    {l:'★ Premium WR', v:premWR!==null?premWR+'%':'–', cls:premWR>=50?'pos':'neg'},
+    {l:'Celkové P&L (R)', v:rSum.toFixed(2)+'R', cls:rSum>=0?'pos':'neg'},
+    {l:'Avg Max R ↑', v:avgMaxR!==null?avgMaxR+'R':'–', cls:'pos'},
+    {l:'Největší série ztrát', v: calcMaxLossSeries(), cls:'neg'},
+    {l:'Auto-vyhodnocených', v: alertHistory.filter(a=>a.autoResolved).length, cls:'neu'},
+    {l:'Alertů celkem', v: alertHistory.length, cls:'neu'},
+  ];
+
+  document.getElementById('stats-rows').innerHTML = rows.map(r=>
+    `<div class="stat-row"><span class="stat-label">${r.l}</span><span class="stat-value ${r.cls}">${r.v}</span></div>`
+  ).join('');
+}
+
+function calcMaxLossSeries() {
+  let max=0, cur=0;
+  alertHistory.filter(a=>a.result&&a.result!=='skip').forEach(a=>{
+    if(a.result==='sl'){cur++;max=Math.max(max,cur);}else cur=0;
+  });
+  return max;
+}
+
+function updateSessionCounter() {
+  const sessKey = getSessionKey();
+  const el = document.getElementById('session-alert-counter');
+  if(!sessKey || !getActiveSession()) { el.style.display='none'; return; }
+  const cnt = sessionCounts[sessKey]||0;
+  el.style.display='flex';
+  el.innerHTML=`<span>Session alerty: <strong>${cnt}/${CONFIG.sessionAlerts}</strong></span>
+    <button class="reset-btn" onclick="resetSessionCount()">RESET</button>`;
+}
+
+function resetSessionCount() {
+  const sessKey = getSessionKey();
+  if(sessKey) { sessionCounts[sessKey]=0; saveAlerts(); updateSessionCounter(); }
+}
+
+function resetStats() {
+  if(!confirm('Opravdu smazat všechny statistiky?')) return;
+  alertHistory=[]; sessionCounts={}; zoneCounts={};
+  saveAlerts(); renderAlerts(); renderStats(); updateSessionCounter();
+}
+
+// Push notifikace
+async function requestNotifPermission() {
+  if('Notification' in window && Notification.permission==='default')
+    await Notification.requestPermission();
+}
+
+function sendPushNotification(alert) {
+  // Browser push
+  if('Notification' in window && Notification.permission==='granted') {
+    const dir = alert.direction==='BULL' ? '▲ BUY' : '▼ SELL';
+    const title = `RIMC ${alert.isPremium?'★ ':''} ${dir} GBPUSD`;
+    const body  = `Lot: ${alert.lot} | Entry: ${(+alert.entry).toFixed(5)}\nTP: ${(+alert.tp).toFixed(5)} | SL: ${(+alert.sl).toFixed(5)}\nRisk: $${alert.riskAmt}`;
+    try { new Notification(title, { body, icon:'./icon-192.png', badge:'./icon-192.png', tag:'rimc-alert', renotify:true }); }
+    catch(e) { console.log('Notification error:', e); }
+  }
+
+  // ★ Discord
+  const isBull = alert.direction === 'BULL';
+  sendDiscord({
+    title: `${isBull?'🟢 BUY':'🔴 SELL'} GBPUSD ${alert.isPremium?'★ PREMIUM':''}`,
+    color: isBull ? 0x00e676 : 0xff1744,
+    fields: [
+      { name: 'Entry',  value: `\`${(+alert.entry).toFixed(5)}\``, inline: true },
+      { name: 'TP',     value: `\`${(+alert.tp).toFixed(5)}\` (+${alert.tpPips}p)`, inline: true },
+      { name: 'SL',     value: `\`${(+alert.sl).toFixed(5)}\` (${alert.slPips}p)`, inline: true },
+      { name: 'Lot',    value: `**${alert.lot}**`, inline: true },
+      { name: 'Risk',   value: `$${alert.riskAmt}`, inline: true },
+      { name: 'Session',value: alert.session, inline: true },
+    ],
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// DISCORD WEBHOOK
+// ══════════════════════════════════════════════════════════════
+
+function sendDiscord(embed) {
+  if(!CONFIG.discordWebhook) return;
+
+  const payload = {
+    username: 'RIMC · GBPUSD',
+    embeds: [{
+      title: embed.title || 'RIMC Alert',
+      color: embed.color || 0x00e5ff,
+      fields: embed.fields || [],
+      footer: { text: `RIMC v6 · ${new Date().toLocaleTimeString('cs-CZ')}` },
+      timestamp: new Date().toISOString(),
+    }],
+  };
+
+  fetch(CONFIG.discordWebhook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(e => {
+    console.log('Discord webhook error:', e);
+    log('⚠ Discord chyba: ' + e.message, 'bear');
+  });
+}
+
+function sendDiscordTradeUpdate(type, trade, msg) {
+  if(!CONFIG.discordWebhook) return;
+
+  const isBull = trade.direction === 'BULL';
+  const colors = {
+    BE:      0x00e5ff,  // cyan
+    PARTIAL: 0xff6b35,  // orange
+    TRAIL:   0x00e676,  // green
+    SL_HIT:  0xff1744,  // red
+    TP_HIT:  0x00e676,  // green
+  };
+  const icons = {
+    BE:      '🔒', PARTIAL: '✂️',
+    TRAIL:   '📈', SL_HIT: '❌', TP_HIT: '✅',
+  };
+
+  const fields = [
+    { name: 'Událost', value: msg, inline: false },
+    { name: 'Entry',   value: `\`${trade.entry.toFixed(5)}\``, inline: true },
+    { name: 'SL',      value: `\`${trade.sl.toFixed(5)}\`${trade.beActivated?' (BE)':''}`, inline: true },
+    { name: 'Max R ↑', value: `**${(trade.maxR||0).toFixed(2)}R**`, inline: true },
+  ];
+
+  // Při uzavření přidej exitR a dobu trvání
+  if(type === 'SL_HIT' || type === 'TP_HIT') {
+    fields.push({ name: 'Exit R', value: `**${(trade.currentR||0).toFixed(2)}R**`, inline: true });
+    if(trade.openTime) {
+      const dur = Math.round((Date.now() - new Date(trade.openTime).getTime()) / 60000);
+      const h = Math.floor(dur / 60);
+      const m = dur % 60;
+      fields.push({ name: 'Doba', value: h > 0 ? `${h}h ${m}m` : `${m}m`, inline: true });
+    }
+    if(trade.partialClosePct) {
+      fields.push({ name: 'Partial', value: `${trade.partialClosePct}%`, inline: true });
+    }
+  }
+
+  sendDiscord({
+    title: `${icons[type]||'📊'} ${type} · ${isBull?'LONG':'SHORT'} GBPUSD`,
+    color: colors[type] || 0x00e5ff,
+    fields,
+  });
+}
+
+function testDiscord() {
+  const url = document.getElementById('cfg-discord').value.trim();
+  if(!url) { alert('Vlož Discord Webhook URL'); return; }
+
+  // Dočasně nastav pro test
+  const old = CONFIG.discordWebhook;
+  CONFIG.discordWebhook = url;
+
+  sendDiscord({
+    title: '🧪 RIMC Test – Discord funguje!',
+    color: 0x5865F2,
+    fields: [
+      { name: 'Status', value: '✓ Webhook aktivní', inline: true },
+      { name: 'Účet',   value: `$${CONFIG.balance}`, inline: true },
+      { name: 'Risk',   value: `${CONFIG.riskPct}%`, inline: true },
+    ],
+  });
+
+  CONFIG.discordWebhook = old;
+  log('🧪 Discord test odeslán', 'info');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if(name==='alerts') { renderAlerts(); updateSessionCounter(); }
+  if(name==='stats') renderStats();
+  if(name==='settings') loadConfigUI();
+}
+
+function switchTF(tf, el) {
+  document.querySelectorAll('.tf-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tf-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tf-' + tf).classList.add('active');
+}
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('install-banner').style.display = 'none';
+  });
+}
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+});
+
+// ============================================================
+// SERVICE WORKER
+// ============================================================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+const $ = id => document.getElementById(id);
+const fmt = (n, d=5) => typeof n === 'number' ? n.toFixed(d) : '–';
+
+function log(msg, type='info') {
+  const list = $('log-list');
+  const t = new Date().toTimeString().slice(0,8);
+  const el = document.createElement('div');
+  el.className = `log-item ${type}`;
+  el.innerHTML = `<span class="log-time">${t}</span><span class="log-msg">${msg}</span>`;
+  list.prepend(el);
+  if (list.children.length > 60) list.lastChild.remove();
+}
+
+function setPhase(id, badgeCls, badgeTxt, detail, cardCls='') {
+  $('ph-' + id).className = 'phase ' + cardCls;
+  const b = $('pb-' + id);
+  b.className = 'phase-badge ' + badgeCls;
+  b.textContent = badgeTxt;
+  $('pd-' + id).textContent = detail;
+}
+
+// ============================================================
+// OPTIMALIZOVANÉ PARAMETRY (backtest 2023-2025, PF/DD optimum)
+// ============================================================
+const P = {
+  // ═══════════════════════════════════════════════════════
+  // OPTIMALIZOVANÉ PARAMETRY v6 – backtest 2024 (IS) / 2023 (OOS)
+  // IS  2024: PF=1.51 N=290 obchodů Net=+53.8R DD=9.1R
+  // OOS 2023: PF=1.62 N=254 obchodů Net=+54.8R DD=7.7R
+  // PF divergence: 0.11 → ROBUSTNÍ
+  // ═══════════════════════════════════════════════════════
+  grabMult:    3.0,    // × M15 ATR – grab šíře
+  rrRatio:     1.5,    // R:R cíl pro TP
+  slPips:      5,      // fixní SL buffer v pipech pod/nad OB
+  obMargin:    25,     // pips tolerance vstupu do OB
+  wickRatio:   0.15,   // min wick/body (rejection svíčka)
+  obBodyMult:  0.08,   // min tělo OB (× H1 ATR)
+  emaBiasF:    20,     // EMA fast H1 bias
+  emaBiasS:    50,     // EMA slow H1 bias
+  reqMSS:      false,  // MSS fáze 4 = volitelná (skip)
+  reqFVG:      false,
+  spreadPips:  2.0,
+  beAtR:       0.8,    // ★ BE management: SL → entry po dosažení 0.8R
+  // Nové parametry z optimalizace v6:
+  slBuffer:    5,      // alias pro slPips – SL buffer v pipech
+  minSLpips:   2,      // minimální SL v pipech
+  maxSLpips:   35,     // maximální SL v pipech
+  bodyMult:    0.2,    // min impulse body (× ATR) pro OB detekci
+  grabLB:      16,     // grab lookback (počet svíček zpět)
+  swingLB:     3,      // swing detection lookback
+  obSearch:    30,     // OB search depth
+  mssWindow:   10,     // MSS lookback window
+  // Sessions: xwide = London 06:30-12:00 UTC, NY 12:30-17:30 UTC
+  biasMode:    'ema50only', // 'strict' = EMA20>EMA50+price, 'ema50only' = price vs EMA50
+};
+
+// ============================================================
+// MATH HELPERS
+// ============================================================
+function calcEMA(data, p) {
+  if(data.length < p) return data[data.length-1];
+  const k = 2/(p+1);
+  let e = data.slice(0,p).reduce((a,b)=>a+b,0)/p;
+  for(let i=p;i<data.length;i++) e=data[i]*k+e*(1-k);
+  return e;
+}
+
+function calcATR(h, l, c, p=14) {
+  const trs=[];
+  for(let i=1;i<h.length;i++) trs.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));
+  if(trs.length<p) return trs.reduce((a,b)=>a+b,0)/Math.max(trs.length,1)||0.0008;
+  let a=trs.slice(0,p).reduce((x,y)=>x+y,0)/p;
+  for(let i=p;i<trs.length;i++) a=(a*(p-1)+trs[i])/p;
+  return a;
+}
+
+// Najde swing highs/lows (min. 2 svíčky vlevo a 1 vpravo)
+function findSwings(candles, lookback=3) {
+  const h=candles.map(c=>c.high), l=candles.map(c=>c.low);
+  const n=candles.length;
+  const highs=[], lows=[];
+  for(let i=lookback;i<n-1;i++){
+    let isHigh=true, isLow=true;
+    for(let j=1;j<=lookback;j++){
+      if(h[i]<=h[i-j]||h[i]<=h[i+Math.min(j,n-1-i)]||h[i]<h[i-j]) isHigh=false;
+      if(l[i]>=l[i-j]||l[i]>=l[i+Math.min(j,n-1-i)]||l[i]>l[i-j]) isLow=false;
+    }
+    if(isHigh) highs.push({idx:i, level:h[i]});
+    if(isLow)  lows.push({idx:i,  level:l[i]});
+  }
+  return {highs, lows};
+}
+
+function renderInds(elId, badgeId, rows) {
+  let bull=0, bear=0, html='';
+  rows.forEach(r=>{
+    const cls=r.s==='BULL'?'iv-bull':r.s==='BEAR'?'iv-bear':'iv-neutral';
+    if(r.s==='BULL') bull++; if(r.s==='BEAR') bear++;
+    html+=`<div class="ind-row"><span class="ind-name">${r.n}</span><span class="ind-val ${cls}">${r.v}</span></div>`;
+  });
+  $(elId).innerHTML=html;
+  const b=$(badgeId);
+  if(bull>bear){b.className='tf-badge bull';b.textContent='BULLISH';}
+  else if(bear>bull){b.className='tf-badge bear';b.textContent='BEARISH';}
+  else{b.className='tf-badge neutral';b.textContent='NEUTRAL';}
+}
+
+// ============================================================
+// FÁZE 1: RANGE – BSL/SSL Liquidity Pools
+// Pravidlo: min 2 dotyky High + 2 dotyky Low na H1, max 3×ATR
+// ============================================================
+function detectRange(candles) {
+  const h=candles.map(c=>c.high), l=candles.map(c=>c.low), c=candles.map(c=>c.close);
+  const atr=calcATR(h,l,c);
+  const lb=Math.min(30, candles.length);
+
+  const rangeHigh = Math.max(...h.slice(-lb));
+  const rangeLow  = Math.min(...l.slice(-lb));
+  const rangeSize = rangeHigh - rangeLow;
+
+  // Počítej dotyky (přiblížení na 15% ATR od hranice)
+  const tolerance = atr * 0.15;
+  let highTouches=0, lowTouches=0;
+  for(let i=candles.length-lb; i<candles.length; i++){
+    if(Math.abs(h[i]-rangeHigh) <= tolerance) highTouches++;
+    if(Math.abs(l[i]-rangeLow)  <= tolerance) lowTouches++;
+  }
+
+  // BSL = Buy Side Liquidity (nad rangeHigh – retail SL jsou tam)
+  // SSL = Sell Side Liquidity (pod rangeLow – retail SL jsou tam)
+  const bsl = rangeHigh; // instituce půjde pro tyto SL při bearish distribuci
+  const ssl = rangeLow;  // instituce půjde pro tyto SL při bullish akumulaci
+
+  const isValid = highTouches>=2 && lowTouches>=2 && rangeSize<=atr*3;
+
+  return { rangeHigh, rangeLow, rangeSize, atr, bsl, ssl,
+           highTouches, lowTouches, isValid };
+}
+
+// ============================================================
+// FÁZE 2: INITIATION – Liquidity Grab + BOS
+// Pravidlo:
+//   1) Wick probije předchozí swing high/low (liquidity grab)
+//   2) Svíčka uzavře ZPĚT za úroveň (potvrzení rejection)
+//   3) Následující svíčka potvrdí BOS (close za strukturu)
+// ============================================================
+function detectLiqGrabBOS(candles, atr) {
+  if(candles.length < 20) return { detected:false };
+
+  const {highs, lows} = findSwings(candles, 3);
+  if(!highs.length || !lows.length) return { detected:false };
+
+  const n = candles.length;
+  const lastSH = highs[highs.length-1];
+  const lastSL = lows[lows.length-1];
+  const prevSH = highs.length>1 ? highs[highs.length-2] : null;
+  const prevSL = lows.length>1  ? lows[lows.length-2]   : null;
+
+  // Zkontroluj posledních 5 svíček zda nastal grab
+  for(let i=Math.max(1, n-5); i<n; i++){
+    const curr = candles[i];
+    const prev = candles[i-1];
+
+    // === BULLISH SETUP ===
+    // 1) Wick probije SSL (swing low) – grab retail SL pod low
+    // 2) Svíčka uzavře nad SSL (rejection – instituce nakoupila)
+    // 3) Pokud existuje BOS (close nad předchozím SH) = potvrzení
+    const grabBull = curr.low < lastSL.level &&          // wick pod SSL
+                     curr.close > lastSL.level &&         // close zpět nad SSL
+                     Math.abs(curr.low-lastSL.level) < atr*1.5; // grab v rozumné vzdálenosti
+
+    if(grabBull){
+      // BOS potvrzení: close nad posledním swing high
+      const bosLevel = prevSH ? prevSH.level : lastSH.level;
+      const bosConfirmed = curr.close > bosLevel ||
+                           (i+1<n && candles[i+1]?.close > bosLevel);
+      return {
+        detected: true,
+        direction: 'BULL',
+        grabLevel: lastSL.level,
+        bosLevel,
+        bosConfirmed,
+        grabCandle: i,
+        type: bosConfirmed ? 'GRAB+BOS' : 'GRAB',
+        candlesAgo: n-1-i
+      };
+    }
+
+    // === BEARISH SETUP ===
+    // 1) Wick probije BSL (swing high) – grab retail SL nad high
+    // 2) Svíčka uzavře pod BSL (rejection)
+    // 3) BOS = close pod předchozím SL
+    const grabBear = curr.high > lastSH.level &&
+                     curr.close < lastSH.level &&
+                     Math.abs(curr.high-lastSH.level) < atr*1.5;
+
+    if(grabBear){
+      const bosLevel = prevSL ? prevSL.level : lastSL.level;
+      const bosConfirmed = curr.close < bosLevel ||
+                           (i+1<n && candles[i+1]?.close < bosLevel);
+      return {
+        detected: true,
+        direction: 'BEAR',
+        grabLevel: lastSH.level,
+        bosLevel,
+        bosConfirmed,
+        grabCandle: i,
+        type: bosConfirmed ? 'GRAB+BOS' : 'GRAB',
+        candlesAgo: n-1-i
+      };
+    }
+  }
+
+  return { detected:false };
+}
+
+// ============================================================
+// FÁZE 3: MITIGATION – Order Block + FVG confluence
+// Order Block: poslední bearish svíčka před bullish impulzem (nebo naopak)
+// FVG: gap mezi svíčkou [i-2].high a svíčkou [i].low
+// Pravidlo: cena se vrátí do OB zóny + OB obsahuje nebo sousedí s FVG
+// ============================================================
+function detectOrderBlock(candles, direction, atr) {
+  if(candles.length < 10) return null;
+  const n = candles.length;
+
+  // Najdi poslední impulzní pohyb (série 2+ svíček stejným směrem, velká těla)
+  let impulseStart = -1;
+  for(let i=n-2; i>=Math.max(3,n-20); i--){
+    const c = candles[i];
+    const body = Math.abs(c.close - c.open);
+    const isBull = c.close > c.open && body > atr*0.5;
+    const isBear = c.close < c.open && body > atr*0.5;
+
+    if(direction==='BULL' && isBull){
+      // OB = poslední BEARISH svíčka před tímto impulzem
+      for(let j=i-1; j>=Math.max(0,i-4); j--){
+        const ob = candles[j];
+        if(ob.close < ob.open){ // bearish svíčka = potenciální OB
+          impulseStart = j;
+          break;
+        }
+      }
+      if(impulseStart>=0) break;
+    }
+    if(direction==='BEAR' && isBear){
+      // OB = poslední BULLISH svíčka před tímto impulzem
+      for(let j=i-1; j>=Math.max(0,i-4); j--){
+        const ob = candles[j];
+        if(ob.close > ob.open){ // bullish svíčka = potenciální OB
+          impulseStart = j;
+          break;
+        }
+      }
+      if(impulseStart>=0) break;
+    }
+  }
+
+  if(impulseStart<0) return null;
+
+  const obCandle = candles[impulseStart];
+  // OB zóna = celé tělo order block svíčky
+  const obTop    = direction==='BULL' ? obCandle.high : Math.max(obCandle.open,obCandle.close);
+  const obBottom = direction==='BULL' ? Math.min(obCandle.open,obCandle.close) : obCandle.low;
+
+  // Zkontroluj zda OB nebyla již mitigována (cena prošla celou zónou)
+  const mitigated = candles.slice(impulseStart+1).some(c =>
+    direction==='BULL' ? c.close < obBottom : c.close > obTop
+  );
+  if(mitigated) return null;
+
+  // Najdi FVG v okolí OB (±3 svíček od impulse)
+  let hasFVG = false, fvgTop=0, fvgBottom=0;
+  for(let i=Math.max(2,impulseStart-1); i<Math.min(n, impulseStart+4); i++){
+    const c1=candles[i-2], c3=candles[i];
+    if(direction==='BULL' && c3.low > c1.high){
+      hasFVG=true; fvgTop=c3.low; fvgBottom=c1.high; break;
+    }
+    if(direction==='BEAR' && c3.high < c1.low){
+      hasFVG=true; fvgTop=c1.low; fvgBottom=c3.high; break;
+    }
+  }
+
+  return {
+    top: obTop, bottom: obBottom,
+    hasFVG, fvgTop, fvgBottom,
+    mitigated: false,
+    candleIdx: impulseStart,
+    size: (obTop-obBottom)*10000
+  };
+}
+
+function checkMitigation(price, ob, direction) {
+  if(!ob) return false;
+  // Cena vstoupila do OB zóny
+  return price >= ob.bottom && price <= ob.top;
+}
+
+// ============================================================
+// FÁZE 4: CONTINUATION – M5 Market Structure Shift
+// Pravidlo: Po vstupu do OB se na M5 vytvoří nový HH (bull) nebo LL (bear)
+// = důkaz že instituce skutečně plnila příkazy
+// ============================================================
+function detectMSS(candles, direction, obEntryTime) {
+  // obEntryTime = index od kdy sledujeme novou strukturu
+  const n = candles.length;
+  const startIdx = Math.max(0, obEntryTime || n-10);
+
+  const {highs, lows} = findSwings(candles, 2);
+
+  // Filtruj swingy APÓS vstupu do OB
+  const recentHighs = highs.filter(s=>s.idx>=startIdx);
+  const recentLows  = lows.filter(s=>s.idx>=startIdx);
+
+  // Předchozí swingy (před vstupem do OB)
+  const prevHighs = highs.filter(s=>s.idx<startIdx);
+  const prevLows  = lows.filter(s=>s.idx<startIdx);
+
+  if(direction==='BULL'){
+    // HH = nový High je vyšší než předchozí High
+    if(!recentHighs.length || !prevHighs.length) return { detected:false };
+    const prevHH = Math.max(...prevHighs.map(s=>s.level));
+    const newHH  = Math.max(...recentHighs.map(s=>s.level));
+    const isHH   = newHH > prevHH;
+    // Navíc cena nesmí udělat nový LL (negace struktury)
+    const noLL   = !recentLows.length || Math.min(...recentLows.map(s=>s.level)) >
+                   (prevLows.length ? Math.min(...prevLows.map(s=>s.level)) : 0);
+    return { detected: isHH, newLevel: newHH, prevLevel: prevHH,
+             clean: isHH && noLL, type:'HH' };
+  } else {
+    if(!recentLows.length || !prevLows.length) return { detected:false };
+    const prevLL = Math.min(...prevLows.map(s=>s.level));
+    const newLL  = Math.min(...recentLows.map(s=>s.level));
+    const isLL   = newLL < prevLL;
+    const noHH   = !recentHighs.length || Math.max(...recentHighs.map(s=>s.level)) <
+                   (prevHighs.length ? Math.max(...prevHighs.map(s=>s.level)) : Infinity);
+    return { detected: isLL, newLevel: newLL, prevLevel: prevLL,
+             clean: isLL && noHH, type:'LL' };
+  }
+}
+
+// ── Grab+BOS v2 – respektuje H1 bias ──────────────────────
+function detectLiqGrabBOS_v2(candles, atr, grabMult, bodyMult, bias) {
+  if(candles.length < 20) return {detected:false};
+  const n = candles.length;
+  const {highs, lows} = findSwings(candles, P.swingLB || 3);
+  if(!highs.length || !lows.length) return {detected:false};
+  const lastSH = highs[highs.length-1];
+  const lastSL = lows[lows.length-1];
+  const prevSH = highs.length>1 ? highs[highs.length-2] : null;
+  const prevSL = lows.length>1  ? lows[lows.length-2]   : null;
+
+  for(let i=Math.max(1, n - (P.grabLB || 16)); i<n; i++){
+    const curr = candles[i];
+    const body = Math.abs(curr.close - curr.open);
+    if(body < atr * bodyMult) continue;
+
+    const lowWick  = Math.min(curr.close, curr.open) - curr.low;
+    const highWick = curr.high - Math.max(curr.close, curr.open);
+
+    // BULL grab
+    if(curr.low  < lastSL.level &&
+       curr.close > lastSL.level &&
+       Math.abs(curr.low - lastSL.level) < atr * grabMult &&
+       curr.close > curr.open &&
+       body > 0 && lowWick / body >= P.wickRatio) {
+      const bosLevel = prevSH ? prevSH.level : lastSH.level;
+      const bosOK = curr.close > bosLevel || (i+1<n && candles[i+1]?.close > bosLevel);
+      if(bosOK) return {detected:true, direction:'BULL', grabLevel:lastSL.level,
+                        bosLevel, bosConfirmed:true, candlesAgo:n-1-i};
+    }
+    // BEAR grab
+    if(curr.high > lastSH.level &&
+       curr.close < lastSH.level &&
+       Math.abs(curr.high - lastSH.level) < atr * grabMult &&
+       curr.close < curr.open &&
+       body > 0 && highWick / body >= P.wickRatio) {
+      const bosLevel = prevSL ? prevSL.level : lastSL.level;
+      const bosOK = curr.close < bosLevel || (i+1<n && candles[i+1]?.close < bosLevel);
+      if(bosOK) return {detected:true, direction:'BEAR', grabLevel:lastSH.level,
+                        bosLevel, bosConfirmed:true, candlesAgo:n-1-i};
+    }
+  }
+  return {detected:false};
+}
+
+// ============================================================
+// MAIN ANALYSIS – optimalizované RIMC parametry
+// ============================================================
+function analyze(h1, m15, m5) {
+  const h1c=h1.map(c=>c.close), h1h=h1.map(c=>c.high), h1l=h1.map(c=>c.low);
+  const m15c=m15.map(c=>c.close), m5c=m5.map(c=>c.close);
+  const price = m5c[m5c.length-1];
+
+  // ── H1 BIAS (respektuje P.biasMode) ─────────────────────────
+  const h1EMA20 = calcEMA(h1c, P.emaBiasF);
+  const h1EMA50 = calcEMA(h1c, P.emaBiasS);
+  let h1Trend;
+  if(P.biasMode === 'ema50only') {
+    // Jednodušší: jen cena vs EMA50
+    h1Trend = h1c[h1c.length-1] > h1EMA50 ? 'BULL' : 'BEAR';
+  } else {
+    h1Trend = h1c[h1c.length-1] > h1EMA50 && h1EMA20 > h1EMA50 ? 'BULL'
+            : h1c[h1c.length-1] < h1EMA50 && h1EMA20 < h1EMA50 ? 'BEAR' : 'NEUTRAL';
+  }
+
+  $('p-trend').textContent = h1Trend;
+  $('p-trend').style.color = h1Trend==='BULL'?'var(--bull)':h1Trend==='BEAR'?'var(--bear)':'var(--neutral)';
+
+  // ── ATR ─────────────────────────────────────────────────────
+  const atr = calcATR(h1h, h1l, h1c);
+  $('p-atr').textContent = (atr*10000).toFixed(1)+'p';
+
+  // Zobraz H1 indikátory
+  renderInds('ind-h1','badge-h1',[
+    {n:'H1 Bias',     v:h1Trend, s:h1Trend==='BULL'?'BULL':h1Trend==='BEAR'?'BEAR':'NEUTRAL'},
+    {n:'EMA20',       v:fmt(h1EMA20), s:h1EMA20>h1EMA50?'BULL':'BEAR'},
+    {n:'EMA50',       v:fmt(h1EMA50), s:'NEUTRAL'},
+    {n:'ATR(14)',     v:(atr*10000).toFixed(1)+'p', s:'NEUTRAL'},
+  ]);
+
+  // ── FÁZE 1: RANGE (kontext) ──────────────────────────────────
+  const range = detectRange(h1);
+  if(h1Trend==='NEUTRAL'){
+    setPhase('range','pb-wait','⏸ NEUTRAL BIAS','H1 EMA20/50 bez jasného směru','');
+  } else {
+    setPhase('range','pb-info',`✓ BIAS ${h1Trend}`,
+      `EMA20:${fmt(h1EMA20,4)} EMA50:${fmt(h1EMA50,4)}`,'info-active');
+  }
+
+  // ── FÁZE 2: INITIATION – Grab+BOS (M15) ────────────────────
+  const atrM15 = calcATR(m15.map(c=>c.high), m15.map(c=>c.low), m15c);
+  const init = detectLiqGrabBOS_v2(m15, atrM15, P.grabMult, P.bodyMult, h1Trend);
+
+  renderInds('ind-m15','badge-m15',[
+    {n:'Grab+BOS',  v:init.detected?`${init.direction} @ ${fmt(init.grabLevel)}`:'ČEKÁM',
+      s:init.detected?init.direction:'NEUTRAL'},
+    {n:'BOS level', v:init.detected?fmt(init.bosLevel):'–', s:'NEUTRAL'},
+    {n:'ATR M15',   v:(atrM15*10000).toFixed(1)+'p', s:'NEUTRAL'},
+  ]);
+
+  if(init.detected && init.bosConfirmed && init.direction===h1Trend){
+    const bc=init.direction==='BULL';
+    setPhase('init',bc?'pb-bull':'pb-bear',
+      `✓ GRAB+BOS ${init.direction}`,
+      `Grab:${fmt(init.grabLevel)} BOS:${fmt(init.bosLevel)}`,
+      bc?'bull-active':'bear-active');
+    log(`GRAB+BOS ${init.direction} @ ${fmt(init.grabLevel)}`,bc?'bull':'bear');
+  } else {
+    setPhase('init','pb-wait','⏳ ČEKÁM NA GRAB+BOS',
+      h1Trend==='NEUTRAL'?'Čekám na H1 bias...':'Sleduji M15 swing high/low...','');
+  }
+
+  // ── FÁZE 3: MITIGATION – Order Block ───────────────────────
+  const dir = init.detected && init.bosConfirmed ? init.direction : null;
+  const obM5  = dir ? detectOrderBlock(m5,  dir, atrM15) : null;
+  const obM15 = dir ? detectOrderBlock(m15, dir, atrM15) : null;
+  const activeOB = obM5 || obM15;
+  const obMarginDecimal = P.obMargin * 0.0001;
+  const inOB = activeOB ?
+    price >= activeOB.bottom - obMarginDecimal &&
+    price <= activeOB.top    + obMarginDecimal : false;
+
+  renderInds('ind-m5','badge-m5',[
+    {n:'Order Block', v:activeOB?`${fmt(activeOB.bottom)}–${fmt(activeOB.top)}`:'HLEDÁM',
+      s:activeOB?dir:'NEUTRAL'},
+    {n:'V OB zóně',  v:inOB?'⚡ ANO':'NE', s:inOB?dir:'NEUTRAL'},
+    {n:'FVG v OB',   v:activeOB?.hasFVG?'✓ ANO':'NE', s:activeOB?.hasFVG?dir:'NEUTRAL'},
+    {n:'OB tf',      v:obM5?'M5':obM15?'M15':'–', s:'NEUTRAL'},
+  ]);
+
+  if(inOB){
+    const bc=dir==='BULL';
+    setPhase('mit',bc?'pb-bull':'pb-bear',
+      `✓ OB ${dir}${activeOB.hasFVG?' +FVG':''}`,
+      `${fmt(activeOB.bottom)}–${fmt(activeOB.top)} | ${obM5?'M5':'M15'}`,
+      bc?'bull-active':'bear-active');
+    log(`OB hit ${dir}: ${fmt(activeOB.bottom)}–${fmt(activeOB.top)}`,bc?'bull':'bear');
+  } else {
+    const dist = activeOB ? (Math.abs(price-(activeOB.top+activeOB.bottom)/2)*10000).toFixed(0)+'p' : '–';
+    setPhase('mit','pb-wait','⏳ ČEKÁM NA OB',
+      activeOB ? `OB nalezen, vzdálenost ${dist}` : 'Hledám Order Block...','');
+  }
+
+  // ── FÁZE 4: CONTINUATION – MSS ─────────────────────────────
+  const mssResult = (dir && inOB) ? detectMSS(m5, dir, m5.length - (P.mssWindow || 12)) : {detected:false};
+
+  // Update M5 indicators with MSS info (don't overwrite H1!)
+  renderInds('ind-m5','badge-m5',[
+    {n:'Order Block', v:activeOB?`${fmt(activeOB.bottom)}–${fmt(activeOB.top)}`:'HLEDÁM',
+      s:activeOB?dir:'NEUTRAL'},
+    {n:'V OB zóně',  v:inOB?'⚡ ANO':'NE', s:inOB?dir:'NEUTRAL'},
+    {n:'FVG v OB',   v:activeOB?.hasFVG?'✓ ANO':'NE', s:activeOB?.hasFVG?dir:'NEUTRAL'},
+    {n:'MSS M5',     v:mssResult.detected?`✓ ${mssResult.type}`:'ČEKÁM',
+      s:mssResult.detected?dir:'NEUTRAL'},
+  ]);
+
+  if(mssResult.detected){
+    const bc=dir==='BULL';
+    setPhase('cont',bc?'pb-bull':'pb-bear',
+      `✓ MSS ${mssResult.type} ${dir}`,
+      `${fmt(mssResult.newLevel)} > ${fmt(mssResult.prevLevel)}`,
+      bc?'bull-active':'bear-active');
+  } else {
+    setPhase('cont','pb-wait','⏳ ČEKÁM NA MSS',
+      dir&&inOB?`M5 ${dir==='BULL'?'Higher High':'Lower Low'}...`:'Čekám na OB vstup...','');
+  }
+
+  // ── FINÁLNÍ SIGNÁL ──────────────────────────────────────────
+  // ── FINÁLNÍ SIGNÁL (respektuje P.reqMSS / biasMode) ──────
+  const mssOK = P.reqMSS ? mssResult.detected : true;
+  const biasOK = P.biasMode === 'ema50only'
+    ? h1Trend !== 'NEUTRAL' || h1c[h1c.length-1] !== h1EMA50 // always pick a side
+    : h1Trend !== 'NEUTRAL';
+
+  const allBull = (P.biasMode==='ema50only' ? h1c[h1c.length-1]>h1EMA50 : h1Trend==='BULL')
+                  && init.detected && init.direction==='BULL' && init.bosConfirmed && inOB && mssOK;
+  const allBear = (P.biasMode==='ema50only' ? h1c[h1c.length-1]<h1EMA50 : h1Trend==='BEAR')
+                  && init.detected && init.direction==='BEAR' && init.bosConfirmed && inOB && mssOK;
+  const isPremium = activeOB?.hasFVG === true;
+
+  const sc=$('sig-card'), sd=$('sig-dir'), sf=$('sig-conf'), sb=$('sig-bar');
+
+  if(allBull || allBear){
+    const isBull = allBull;
+    const conf   = isPremium ? 85 : 68;
+    const slDec  = P.slPips * 0.0001;
+    const sl     = isBull
+      ? activeOB.bottom - slDec
+      : activeOB.top    + slDec;
+    const risk = Math.abs(price - sl);
+    const tp   = isBull ? price + risk * P.rrRatio : price - risk * P.rrRatio;
+    const slPips = Math.abs(price-sl)*10000;
+
+    // SL filtr
+    if(slPips >= P.minSLpips && slPips <= P.maxSLpips){
+      sc.className=`signal-card ${isBull?'bullish':'bearish'}`;
+      sd.className=`sig-dir ${isBull?'bull':'bear'}`;
+      sd.textContent=`${isBull?'▲ BUY':'▼ SELL'}${isPremium?' ★':''}`;
+      sf.textContent=`${isPremium?'PREMIUM':'STANDARD'} | ${conf}% | SL:${slPips.toFixed(0)}p`;
+      sb.className=`conf-fill ${isBull?'cf-bull':'cf-bear'}`;
+      sb.style.width=conf+'%';
+      $('sig-entry').textContent=fmt(price);
+      $('sig-tp').textContent=fmt(tp);
+      $('sig-sl').textContent=fmt(sl);
+
+      const sigHash=`${isBull?'BULL':'BEAR'}_${fmt(price)}_${fmt(sl)}`;
+      if(lastSignalHash!==sigHash){
+        lastSignalHash=sigHash;
+        const alertId = fireAlert(isBull?'BULL':'BEAR',price,tp,sl,conf,isPremium);
+        if(!activeTrade && alertId){
+          const lot=calcLotSize(price,sl);
+          openTrade(isBull?'BULL':'BEAR',price,sl,tp,lot,isPremium, alertId);
+        }
+      }
+      log(`${isPremium?'★ ':''}${isBull?'🟢 BUY':'🔴 SELL'} @ ${fmt(price)} SL:${slPips.toFixed(0)}p TP:${(Math.abs(tp-price)*10000).toFixed(0)}p`,isBull?'bull':'bear');
+    }
+  } else {
+    sc.className='signal-card';
+    sd.className='sig-dir neutral'; sd.textContent='ČEKÁM';
+    const phases=[h1Trend!=='NEUTRAL',init.detected&&init.bosConfirmed,inOB,mssResult.detected].filter(Boolean).length;
+    sf.textContent=`Splněno ${phases}/4 fází`;
+    sb.className='conf-fill cf-neutral'; sb.style.width=Math.max(8,phases*22)+'%';
+    $('sig-entry').textContent='–'; $('sig-tp').textContent='–'; $('sig-sl').textContent='–';
+    if(h1Trend!=='NEUTRAL'&&lastSignalHash) lastSignalHash=null;
+  }
+
+  // ── ZÓNY ────────────────────────────────────────────────────
+  const zones=[];
+  if(range.isValid) zones.push({type:'range',top:range.rangeHigh,bottom:range.rangeLow,tf:'H1',fresh:true});
+  if(init.detected) zones.push({type:'BOS',top:init.bosLevel+atrM15*0.2,bottom:init.bosLevel-atrM15*0.2,tf:'M15',fresh:true});
+  if(obM15) zones.push({type:'OB',top:obM15.top,bottom:obM15.bottom,tf:'M15',hasFVG:obM15.hasFVG,fresh:true});
+  if(obM5)  zones.push({type:'OB',top:obM5.top, bottom:obM5.bottom, tf:'M5', hasFVG:obM5.hasFVG, fresh:true});
+
+  const zEl=$('zones-list');
+  if(!zones.length){zEl.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim)">Žádné aktivní zóny</div>';return;}
+  const tl={range:'Range H1',BOS:'BOS Level',OB:'Order Block'};
+  const tc={range:'zt-range',BOS:'zt-bos',OB:'zt-bos'};
+  zEl.innerHTML=zones.map(z=>{
+    const dist=(Math.abs(price-(z.top+z.bottom)/2)*10000).toFixed(0);
+    const inZ=price>=z.bottom&&price<=z.top;
+    return`<div class="zone-item">
+      <span class="zt ${tc[z.type]}">${tl[z.type]||z.type}${z.hasFVG?' +FVG':''}</span>
+      <div class="zone-info">
+        <div class="zone-range">${fmt(z.bottom)}–${fmt(z.top)}</div>
+        <div class="zone-meta">${z.tf} · ${dist}p${inZ?' · <span class="zone-in">⚡ V ZÓNĚ</span>':''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// FETCH DATA
+// ============================================================
+function genDemo(base,atr,n,trend=0){
+  const out=[];let p=base;
+  for(let i=0;i<n;i++){
+    const m=(Math.random()-.48+trend*.05)*atr;
+    const o=p;p+=m;
+    out.push({open:o,high:Math.max(o,p)+Math.random()*atr*.3,low:Math.min(o,p)-Math.random()*atr*.3,close:p});
+  }
+  return out;
+}
+
+async function fetchCandles(interval,size=100){
+  const url=`https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(CONFIG.symbol)}&interval=${interval}&outputsize=${size}&apikey=${CONFIG.apiKey}&format=JSON`;
+  const r=await fetch(url);const j=await r.json();
+  if(!j.values) throw new Error(j.message||'API chyba');
+  return j.values.reverse().map(c=>({open:+c.open,high:+c.high,low:+c.low,close:+c.close}));
+}
+
+async function fetchPrice(){
+  const r=await fetch(`https://api.twelvedata.com/price?symbol=${encodeURIComponent(CONFIG.symbol)}&apikey=${CONFIG.apiKey}`);
+  const j=await r.json();return parseFloat(j.price);
+}
+
+async function fetchAndAnalyze(){
+  $('loading').style.display='flex';
+  try {
+    let h1,m15,m5,price;
+    const isDemo=!CONFIG.apiKey;
+    $('api-notice').style.display=isDemo?'block':'none';
+
+    if(isDemo){
+      const base=1.27350,atr=0.0008;
+      h1=genDemo(base,atr*3,100,.3);
+      m15=genDemo(base,atr*1.5,100,.4);
+      m5=genDemo(base,atr,100,.5);
+      price=m5[m5.length-1].close;
+      // inject FVG
+      const ci=m5.length-5;
+      m5[ci-2].high=price-.0015;m5[ci].low=price-.0005;
+    } else {
+      [h1,m15,m5,price]=await Promise.all([fetchCandles('1h'),fetchCandles('15min'),fetchCandles('5min'),fetchPrice()]);
+    }
+
+    const last=m5[m5.length-1],prev=m5[m5.length-2];
+    const chg=price-prev.close,chgP=(chg/prev.close*100);
+    $('cur-price').textContent=price.toFixed(5);
+    const cb=$('price-chg');
+    cb.textContent=`${chg>=0?'+':''}${chg.toFixed(5)} (${chgP.toFixed(3)}%)`;
+    cb.className=`price-change ${chg>=0?'up':'down'}`;
+    $('p-high').textContent=last.high.toFixed(5);
+    $('p-low').textContent=last.low.toFixed(5);
+    $('last-update').textContent=new Date().toLocaleTimeString('cs-CZ')+(isDemo?' [DEMO]':'');
+
+    log(`Data aktualizována${isDemo?' [DEMO]':''}@${new Date().toLocaleTimeString('cs-CZ')}`,'info');
+    analyze(h1,m15,m5);
+    // Trade management – předej aktuální cenu a M5 svíčky
+    if(activeTrade) manageTrade(price, m5);
+  } catch(e){
+    log(`Chyba: ${e.message}`,'bear');
+    $('api-notice').style.display='block';
+  } finally {
+    $('loading').style.display='none';
+  }
+}
+
+// ============================================================
+// SESSION WINDOW (London 08:00–11:00 CET, NY 14:30–17:30 CET)
+// ============================================================
+const SESSIONS = [
+  { name: 'London',   start: { h:6,  m:30 }, end: { h:12, m:0  } },  // xwide
+  { name: 'New York', start: { h:12, m:30 }, end: { h:17, m:30 } },  // xwide
+];
+
+function getCETMinutes() {
+  // Sessions jsou definované v UTC, takže použijeme přímo UTC
+  const now = new Date();
+  return now.getUTCHours() * 60 + now.getUTCMinutes();
+}
+
+function getActiveSession() {
+  const nowMin = getCETMinutes();
+  for (const s of SESSIONS) {
+    const start = s.start.h * 60 + s.start.m;
+    const end   = s.end.h   * 60 + s.end.m;
+    if (nowMin >= start && nowMin < end) return s;
+  }
+  return null;
+}
+
+function getNextSessionInfo() {
+  const nowMin = getCETMinutes();
+  let best = null, minWait = Infinity;
+  for (const s of SESSIONS) {
+    const start = s.start.h * 60 + s.start.m;
+    let wait = start - nowMin;
+    if (wait <= 0) wait += 24 * 60;
+    if (wait < minWait) { minWait = wait; best = { session: s, waitMin: wait }; }
+  }
+  return best;
+}
+
+function renderSessionStatus() {
+  const active = getActiveSession();
+  const bar = document.querySelector('.topbar-left p');
+  if (active) {
+    bar.innerHTML = `<span style="color:var(--bull)">▶ ${active.name} session AKTIVNÍ</span>`;
+  } else {
+    const next = getNextSessionInfo();
+    const h = Math.floor(next.waitMin / 60);
+    const m = next.waitMin % 60;
+    bar.innerHTML = `<span style="color:var(--text-dim)">⏸ Mimo session · ${next.session.name} za ${h}h ${m}m</span>`;
+  }
+}
+
+function renderSessionBanner() {
+  // Odstraň starý banner pokud existuje
+  const old = document.getElementById('session-banner');
+  if (old) old.remove();
+
+  const active = getActiveSession();
+  if (!active) {
+    const next = getNextSessionInfo();
+    const h = Math.floor(next.waitMin / 60);
+    const m = next.waitMin % 60;
+    const banner = document.createElement('div');
+    banner.id = 'session-banner';
+    banner.style.cssText = `
+      margin:0 16px 8px; padding:12px 14px;
+      background:rgba(84,110,122,.08); border:1px solid rgba(84,110,122,.25);
+      border-radius:8px; font-family:var(--mono); font-size:10px;
+      color:var(--neutral); line-height:1.7;
+    `;
+    banner.innerHTML = `
+      ⏸ <strong style="color:var(--text)">MIMO TRADING SESSION</strong><br>
+      API se neobnovuje – šetřím kredity.<br>
+      🕐 London 06:30–12:00 UTC &nbsp;|&nbsp; NY 12:30–17:30 UTC<br>
+      ▶ Další session: <strong style="color:var(--accent)">${next.session.name}</strong> za <strong style="color:var(--accent)">${h}h ${m}m</strong>
+    `;
+    // vlož za api-notice
+    const anchor = document.getElementById('api-notice');
+    anchor.parentNode.insertBefore(banner, anchor.nextSibling);
+  }
+}
+
+function startAutoRefresh(){
+  if(refreshTimer) clearInterval(refreshTimer);
+
+  const tick = () => {
+    renderSessionStatus();
+    renderSessionBanner();
+    const session = getActiveSession();
+    if (session) {
+      fetchAndAnalyze();
+    } else {
+      // Mimo session – jen log jednou za hodinu
+      const nowMin = getCETMinutes();
+      if (nowMin % 60 === 0) log('⏸ Mimo session – API pozastaveno', 'info');
+    }
+  };
+
+  refreshTimer = setInterval(tick, CONFIG.interval);
+  // Aktualizuj session status každou minutu bez ohledu na interval
+  setInterval(renderSessionStatus, 60000);
+  setInterval(renderSessionBanner, 60000);
+}
+
+// START
+loadConfigUI();
+requestNotifPermission();
+renderAlerts();
+renderStats();
+updateSessionCounter();
+renderSessionStatus();
+renderSessionBanner();
+const initSession = getActiveSession();
+if (initSession) {
+  fetchAndAnalyze();
+} else {
+  document.getElementById('loading').style.display = 'none';
+  log('⏸ Appka spuštěna mimo session – čekám na London/NY', 'info');
+}
+startAutoRefresh();
+
+
+
+
+
+
+
+
+
+
+// ============================================================
+// POKROČILÉ ŘÍZENÍ TRADE – Trailing & Partial Close
+// ============================================================
+
+// Aktivní obchod state
+let activeTrade = null;
+
+// ── Fractal detekce (Williams fractal – 2 svíčky vlevo/vpravo) ──
+function detectFractals(candles) {
+  const highs = [], lows = [];
+  for(let i=2; i<candles.length-2; i++){
+    const h = candles[i].high, l = candles[i].low;
+    if(h > candles[i-1].high && h > candles[i-2].high &&
+       h > candles[i+1].high && h > candles[i+2].high)
+      highs.push({ idx:i, level:h });
+    if(l < candles[i-1].low && l < candles[i-2].low &&
+       l < candles[i+1].low && l < candles[i+2].low)
+      lows.push({ idx:i, level:l });
+  }
+  return { highs, lows };
+}
+
+// ── Agresivní trend detekce (min 2/3 podmínek) ──────────────
+function isAggressiveTrend(m5Candles, direction) {
+  const closes = m5Candles.map(c=>c.close);
+  const highs  = m5Candles.map(c=>c.high);
+  const lows   = m5Candles.map(c=>c.low);
+  const n = closes.length;
+  const price = closes[n-1];
+
+  const ema50  = calcEMA(closes, 50);
+  const ema200 = calcEMA(closes, 200);
+
+  // Podmínka A: EMA50 vs EMA200
+  const condA = direction==='BULL' ? ema50 > ema200 : ema50 < ema200;
+
+  // Podmínka B: Cena na správné straně EMA50
+  const condB = direction==='BULL' ? price > ema50 : price < ema50;
+
+  // Podmínka C: Poslední BOS svíčka je impulzivní
+  // Průměrná velikost posledních 5 svíček
+  const avg5 = closes.slice(-6,-1).map((c,i,a)=>
+    Math.abs(c - (i>0?a[i-1]:closes[n-7]))).reduce((a,b)=>a+b,0) / 5;
+  const lastBody = Math.abs(closes[n-1] - m5Candles[n-1].open);
+  const condC = lastBody > avg5;
+
+  const score = [condA, condB, condC].filter(Boolean).length;
+  return {
+    isAggressive: score >= 2,
+    score,
+    condA, condB, condC,
+    ema50, ema200,
+  };
+}
+
+// ── Trailing SL po fractal + BOS (M5) ───────────────────────
+function calcTrailingSL(m5Candles, direction, currentSL, bufferPips=3) {
+  const buffer = bufferPips * 0.0001;
+  const { highs, lows } = detectFractals(m5Candles);
+  const n = m5Candles.length;
+  const closes = m5Candles.map(c=>c.close);
+
+  if(direction === 'BULL') {
+    // Najdi poslední potvrzený fractal low
+    if(!lows.length) return { newSL: currentSL, bosDetected: false };
+    const lastFractalLow = lows[lows.length-1];
+
+    // Najdi poslední relevantní swing high (po fractal low)
+    const recentHighs = highs.filter(h=>h.idx > lastFractalLow.idx);
+    if(!recentHighs.length) return { newSL: currentSL, bosDetected: false };
+    const swingHigh = recentHighs[recentHighs.length-1].level;
+
+    // BOS = svíčka uzavřela nad swing high
+    const bosConfirmed = closes[n-1] > swingHigh;
+    if(!bosConfirmed) return { newSL: currentSL, bosDetected: false };
+
+    // Nový SL = fractal low - buffer
+    const newSL = lastFractalLow.level - buffer;
+    // Posun jen pokud je nový SL vyšší než aktuální
+    return {
+      newSL: newSL > currentSL ? newSL : currentSL,
+      bosDetected: true,
+      fractalLevel: lastFractalLow.level,
+      swingHigh,
+    };
+
+  } else { // BEAR
+    if(!highs.length) return { newSL: currentSL, bosDetected: false };
+    const lastFractalHigh = highs[highs.length-1];
+
+    const recentLows = lows.filter(l=>l.idx > lastFractalHigh.idx);
+    if(!recentLows.length) return { newSL: currentSL, bosDetected: false };
+    const swingLow = recentLows[recentLows.length-1].level;
+
+    const bosConfirmed = closes[n-1] < swingLow;
+    if(!bosConfirmed) return { newSL: currentSL, bosDetected: false };
+
+    const newSL = lastFractalHigh.level + buffer;
+    return {
+      newSL: newSL < currentSL ? newSL : currentSL,
+      bosDetected: true,
+      fractalLevel: lastFractalHigh.level,
+      swingLow,
+    };
+  }
+}
+
+// ── Hlavní trade management funkce ──────────────────────────
+// Voláno při každém refreshi pokud existuje aktivní obchod
+function manageTrade(currentPrice, m5Candles) {
+  if(!activeTrade) return;
+
+  const t = activeTrade;
+  const dir = t.direction;
+  const BE_BUFFER = 0.0001; // 1 pip
+  const risk = Math.abs(t.entry - t.originalSL); // 1R v ceně (fixní od otevření)
+  if(risk < 1e-6) return;
+
+  // Výpočet aktuálního R
+  const currentR = dir==='BULL'
+    ? (currentPrice - t.entry) / risk
+    : (t.entry - currentPrice) / risk;
+
+  t.currentR = currentR;
+
+  // Sleduj Maximum Favorable Excursion
+  if(currentR > (t.maxR || 0)) {
+    t.maxR = currentR;
+  }
+
+  // ★ Live sync maxR/currentR na propojený alert
+  syncAlertLiveData(t);
+
+  // ── FÁZE 2: při P.beAtR → BE + 1 pip ───────────────────────
+  if(!t.beActivated && currentR >= P.beAtR) {
+    const newSL = dir==='BULL'
+      ? t.entry + BE_BUFFER
+      : t.entry - BE_BUFFER;
+
+    if((dir==='BULL' && newSL > t.sl) || (dir==='BEAR' && newSL < t.sl)) {
+      t.sl = newSL;
+      t.beActivated = true;
+      const msg = `🔒 BE aktivován @ ${t.entry.toFixed(5)} +1p | Aktuální R: ${currentR.toFixed(2)}`;
+      log(msg, 'info');
+      fireTradeNotification('BE', t, msg);
+      renderTradeManager();
+    }
+  }
+
+  // ── FÁZE 3: při 2R → partial close + agresivita ────────────
+  if(!t.partialClosed && currentR >= 2.0) {
+    const trendInfo = isAggressiveTrend(m5Candles, dir);
+    const closePct  = trendInfo.isAggressive ? 30 : 50;
+
+    t.partialClosed   = true;
+    t.partialClosePct = closePct;
+    t.trendInfo       = trendInfo;
+    t.trailingActive  = true;
+
+    const msg = `📊 ${trendInfo.isAggressive?'AGRESIVNÍ':'STANDARD'} trend (${trendInfo.score}/3) | Partial close ${closePct}% @ 2R | Trailing aktivován`;
+    log(msg, trendInfo.isAggressive ? 'bull' : 'info');
+    fireTradeNotification('PARTIAL', t, msg);
+    renderTradeManager();
+  }
+
+  // ── FÁZE 4: od 2R → structure trailing (fractal + BOS) ─────
+  if(t.trailingActive && currentR >= 2.0) {
+    const trailing = calcTrailingSL(m5Candles, dir, t.sl, 3);
+    if(trailing.bosDetected && trailing.newSL !== t.sl) {
+      const oldSL = t.sl;
+      t.sl = trailing.newSL;
+      t.trailingHistory = t.trailingHistory || [];
+      t.trailingHistory.push({ r: currentR.toFixed(2), newSL: t.sl, fractal: trailing.fractalLevel });
+
+      const msg = `📈 Trailing SL posun: ${oldSL.toFixed(5)} → ${t.sl.toFixed(5)} | BOS fractal @ ${trailing.fractalLevel?.toFixed(5)} | R: ${currentR.toFixed(2)}`;
+      log(msg, 'bull');
+      fireTradeNotification('TRAIL', t, msg);
+      renderTradeManager();
+    }
+  }
+
+  // Save state
+  localStorage.setItem('rimc_active_trade', JSON.stringify(activeTrade));
+
+  // ── Kontrola SL hitu (★ automatické vyhodnocení) ──────────
+  if((dir==='BULL' && currentPrice <= t.sl) ||
+     (dir==='BEAR' && currentPrice >= t.sl)) {
+    const result = t.beActivated ? 'be' : 'sl';
+    const finalR = t.currentR.toFixed(2);
+    const maxR   = t.maxR.toFixed(2);
+    log(`${result==='be'?'➡️ BE':'❌ SL'} HIT @ ${currentPrice.toFixed(5)} | Exit R: ${finalR} | Max R: ${maxR}`, result==='be'?'info':'bear');
+    fireTradeNotification('SL_HIT', t, `${result==='be'?'BE':'SL'} @ ${currentPrice.toFixed(5)} | R: ${finalR} | Max: ${maxR}`);
+    closeTrade(result, true);  // ★ isAuto = true
+    return;
+  }
+
+  // ── Kontrola TP hitu (★ automatické vyhodnocení) ──────────
+  if((dir==='BULL' && currentPrice >= t.tp) ||
+     (dir==='BEAR' && currentPrice <= t.tp)) {
+    const finalR = t.currentR.toFixed(2);
+    const maxR   = t.maxR.toFixed(2);
+    log(`✅ TP HIT @ ${currentPrice.toFixed(5)} | Exit R: ${finalR} | Max R: ${maxR}`, 'bull');
+    fireTradeNotification('TP_HIT', t, `TP @ ${currentPrice.toFixed(5)} | R: ${finalR} | Max: ${maxR}`);
+    closeTrade('tp', true);  // ★ isAuto = true
+    return;
+  }
+
+  renderTradeManager();
+}
+
+// ★ Průběžně synchronizuje maxR/currentR z activeTrade do alert historie
+function syncAlertLiveData(trade) {
+  if(!trade || !trade.alertId) return;
+  const alert = alertHistory.find(a => a.id === trade.alertId);
+  if(!alert || alert.result) return;  // už vyhodnocený, nesahat
+
+  let changed = false;
+  if(trade.maxR > (alert.maxR || 0)) {
+    alert.maxR = trade.maxR;
+    changed = true;
+  }
+  alert.currentR = trade.currentR;
+
+  // Uložit jen občas (každých 5 updatů) aby se nebombardoval localStorage
+  if(changed) {
+    saveAlerts();
+    renderAlerts();
+  }
+}
+
+function openTrade(direction, entry, sl, tp, lot, isPremium, alertId) {
+  activeTrade = {
+    direction, entry, sl, tp, lot, isPremium,
+    alertId: alertId || null,   // ★ Přímé propojení s alertem
+    originalSL: sl, originalTP: tp,
+    beActivated: false,
+    partialClosed: false,
+    trailingActive: false,
+    trailingHistory: [],
+    currentR: 0,
+    maxR: 0,
+    openTime: new Date().toISOString(),
+  };
+  localStorage.setItem('rimc_active_trade', JSON.stringify(activeTrade));
+  log(`🟢 Trade otevřen: ${direction} @ ${entry.toFixed(5)} | SL: ${sl.toFixed(5)} | TP: ${tp.toFixed(5)} | Lot: ${lot}`, direction==='BULL'?'bull':'bear');
+  renderTradeManager();
+}
+
+function closeTrade(result, isAuto) {
+  if(!activeTrade) return;
+
+  // ★ Najdi alert přes alertId (přímé propojení), fallback na fuzzy match
+  let existing = null;
+  if(activeTrade.alertId) {
+    existing = alertHistory.find(a => a.id === activeTrade.alertId);
+  }
+  if(!existing) {
+    existing = alertHistory.find(a =>
+      Math.abs(a.entry - activeTrade.entry) < 0.0001 && !a.result
+    );
+  }
+
+  if(existing) {
+    existing.maxR        = activeTrade.maxR || 0;
+    existing.exitR       = activeTrade.currentR || 0;
+    existing.partialPct  = activeTrade.partialClosePct || null;
+    existing.autoResolved = !!isAuto;
+
+    // ★ Vypočítej dobu trvání obchodu
+    const openMs  = new Date(activeTrade.openTime).getTime();
+    const closeMs = Date.now();
+    const durMin  = Math.round((closeMs - openMs) / 60000);
+    existing.duration = durMin;
+
+    setAlertResult(existing.id, result);
+  }
+
+  activeTrade = null;
+  localStorage.removeItem('rimc_active_trade');
+  renderTradeManager();
+}
+
+function fireTradeNotification(type, trade, msg) {
+  const titles = {
+    BE: '🔒 RIMC BE Aktivován',
+    PARTIAL: '✂ RIMC Partial Close',
+    TRAIL: '📈 RIMC Trailing SL',
+    SL_HIT: '❌ RIMC SL Hit',
+    TP_HIT: '✅ RIMC TP Hit',
+  };
+  // Browser push
+  if('Notification' in window && Notification.permission==='granted') {
+    try { new Notification(titles[type]||'RIMC', { body:msg, icon:'./icon-192.png', tag:'rimc-trade' }); } catch(e){}
+  }
+  // ★ Discord
+  sendDiscordTradeUpdate(type, trade, msg);
+}
+
+// ── Trade Manager UI ─────────────────────────────────────────
+function renderTradeManager() {
+  const el = document.getElementById('trade-manager');
+  if(!el) return;
+
+  if(!activeTrade) {
+    el.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:8px">Žádný aktivní obchod.</div>';
+    return;
+  }
+
+  const t = activeTrade;
+  const dir = t.direction;
+  const isBull = dir==='BULL';
+  const risk = Math.abs(t.entry - t.originalSL);
+  const rColor = t.currentR>=2?'var(--bull)':t.currentR>=1?'var(--accent)':t.currentR>=0?'var(--text)':'var(--bear)';
+  const phase = !t.beActivated?'Fáze 1 – Čekám 1R':
+                !t.partialClosed?'Fáze 2 – BE aktivován, čekám 2R':
+                t.trailingActive?'Fáze 3/4 – Trailing aktivní':'Fáze 3 – Partial close';
+
+  const trailRows = (t.trailingHistory||[]).slice(-3).reverse().map(h=>
+    `<div style="font-family:var(--mono);font-size:9px;color:var(--text-dim)">R:${h.r} → SL:${(+h.newSL).toFixed(5)}</div>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="alert-card ${isBull?'bull':'bear'}" style="margin-bottom:0">
+      <div class="alert-header">
+        <div>
+          <span class="alert-dir ${isBull?'bull':'bear'}">${isBull?'▲ LONG':'▼ SHORT'}${t.isPremium?' ★':''}</span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-dim);margin-left:8px">${phase}</span>
+        </div>
+        <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:${rColor}">${(t.currentR||0).toFixed(2)}R</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:10px">
+        ${t.lot} lot
+      </div>
+      <div class="alert-levels" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div class="alert-lev"><label>ENTRY</label><value style="color:var(--accent)">${t.entry.toFixed(5)}</value></div>
+        <div class="alert-lev"><label>TP</label><value style="color:var(--bull)">${t.tp.toFixed(5)}</value></div>
+        <div class="alert-lev"><label>SL ${t.beActivated?'(BE)':''}</label><value style="color:var(--bear)">${t.sl.toFixed(5)}</value></div>
+        <div class="alert-lev"><label>MAX R ↑</label><value style="color:var(--accent2)">${(t.maxR||0).toFixed(2)}R</value></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;padding:8px;background:var(--bg);border-radius:6px">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:1.5px">MAX R ↑</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--bull)">${(t.maxR||0).toFixed(2)}R</div>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);letter-spacing:1.5px">AKTUÁLNÍ R</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:${rColor}">${(t.currentR||0).toFixed(2)}R</div>
+        </div>
+      </div>
+      ${t.partialClosed?`
+      <div style="font-family:var(--mono);font-size:10px;color:var(--accent2);margin:8px 0">
+        ✂ Partial close ${t.partialClosePct}% @ 2R | ${t.trendInfo?.isAggressive?'AGRESIVNÍ':'STANDARD'} trend (${t.trendInfo?.score}/3)
+      </div>`:''}
+      ${trailRows?`<div style="margin-top:6px">${trailRows}</div>`:''}
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="result-btn" style="flex:1" onclick="closeTrade('tp', false)">✓ ZAVŘÍT TP</button>
+        <button class="result-btn" style="flex:1" onclick="closeTrade('sl', false)">✗ ZAVŘÍT SL</button>
+        <button class="result-btn" style="flex:1" onclick="closeTrade('be', false)">→ ZAVŘÍT BE</button>
+      </div>
+    </div>`;
+}
+
+// Načti aktivní trade z localStorage při startu
+const savedTrade = localStorage.getItem('rimc_active_trade');
+if(savedTrade) { try { activeTrade = JSON.parse(savedTrade); } catch(e){} }
+
+</script>
+</body>
+</html>

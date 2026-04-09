@@ -626,7 +626,7 @@ body::before {
         Pro live data se zaregistruj zdarma na <strong style="color:var(--accent)">twelvedata.com</strong> a vlož API klíč. Bez klíče běží DEMO mód.
       </div>
       <div class="config-note" style="border-color:rgba(0,229,255,.3);color:var(--accent)">
-        ★ Backtest v6: IS 2024 PF=1.51 N=290 | OOS 2023 PF=1.62 N=254 | BE@0.8R | RR 1.5:1
+        ★ Backtest v6: IS 2024 PF=1.51 N=290 | OOS 2023 PF=1.62 N=254 | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e5a7a0a5d5cbddb7">[email&#160;protected]</a> | RR 1.5:1
       </div>
       <div class="config-row">
         <label>API Klíč (Twelve Data)</label>
@@ -719,7 +719,7 @@ body::before {
   </button>
 </nav>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ============================================================
 // CONFIG + RISK MANAGEMENT
 // ============================================================
@@ -1844,15 +1844,15 @@ async function fetchAndAnalyze(){
 
     if(isDemo){
       const base=1.27350,atr=0.0008;
-      h1=genDemo(base,atr*3,100,.3);
-      m15=genDemo(base,atr*1.5,100,.4);
-      m5=genDemo(base,atr,100,.5);
+      h1=genDemo(base,atr*3,500,.3);
+      m15=genDemo(base,atr*1.5,500,.4);
+      m5=genDemo(base,atr,300,.5);
       price=m5[m5.length-1].close;
       // inject FVG
       const ci=m5.length-5;
       m5[ci-2].high=price-.0015;m5[ci].low=price-.0005;
     } else {
-      [h1,m15,m5,price]=await Promise.all([fetchCandles('1h'),fetchCandles('15min'),fetchCandles('5min'),fetchPrice()]);
+      [h1,m15,m5,price]=await Promise.all([fetchCandles('1h',500),fetchCandles('15min',500),fetchCandles('5min',300),fetchPrice()]);
     }
 
     const last=m5[m5.length-1],prev=m5[m5.length-2];
@@ -2365,10 +2365,6 @@ function renderTradeManager() {
       </div>
     </div>`;
 }
-
-// Načti aktivní trade z localStorage při startu
-const savedTrade = localStorage.getItem('rimc_active_trade');
-if(savedTrade) { try { activeTrade = JSON.parse(savedTrade); } catch(e){} }
 
 </script>
 </body>
